@@ -1,7 +1,10 @@
+import React from 'react'
+import VerticalNavBar from './components/VerticalNavBar'
+
 function App() {
   return (
-    <div className="p-4" style={{ backgroundColor: 'var(--main-color)', color: 'var(--grey)' }}>
-      Your content here
+    <div className="flex" style={{ backgroundColor: 'var(--background-light)' }}>
+      <VerticalNavBar />
     </div>
 
   )
