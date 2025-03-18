@@ -1,9 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import session from 'express-session';
 import { connectDB } from './config/db.js';
 
 import productRoutes from './routes/product.route.js'; 
 import orderRoutes from './routes/order.route.js';  
+import authRoutes from './routes/auth.route.js';
 
 dotenv.config();
 
@@ -11,6 +13,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json()); 
+
+app.use(session({
+    secret: "secretkeyabc12345", 
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 } // 1 day
+}));
+
+app.use("/api/auth", authRoutes);
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
