@@ -3,7 +3,7 @@ import { useState } from "react"; // To manage the toggle state
 import { FaHome, FaPlus, FaBox, FaClipboardList, FaBars, FaTimes } from "react-icons/fa"; // Import icons
 import { IoPawSharp } from "react-icons/io5";
 
-const VerticalNavbar = () => {
+const AdminSideBar = () => {
   const [isOpen, setIsOpen] = useState(true); // State to manage navbar open/close
 
   const toggleNavbar = () => setIsOpen(!isOpen); // Toggle function for the navbar
@@ -75,4 +75,4 @@ const VerticalNavbar = () => {
   );
 };
 
-export default VerticalNavbar;
+export default AdminSideBar;

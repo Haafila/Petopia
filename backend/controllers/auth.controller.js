@@ -33,6 +33,14 @@ export const profile = (req, res) => {
   res.json({ message: "User profile", user: req.session.user });
 };
 
+export const getSessionUser = (req, res) => {
+  if (req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
 export const register = async (req, res) => {
   console.log("Register route hit"); // Debug: Check if the route is being called
   console.log("Request Body:", req.body); // Debug: Log the request body

@@ -1,11 +1,9 @@
 import React from 'react'
-import VerticalNavBar from './components/VerticalNavBar'
+import AdminDashboardLayout from './pages/AdminDashboardLayout'
 
 function App() {
   return (
-    <div className="flex" style={{ backgroundColor: 'var(--background-light)' }}>
-      <VerticalNavBar />
-    </div>
+    <AdminDashboardLayout />
 
   )
 }
