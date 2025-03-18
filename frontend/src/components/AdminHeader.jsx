@@ -5,15 +5,14 @@ import { Popover, Transition } from '@headlessui/react';
 export default function AdminHeader() {
   const [session, setSession] = useState({ name: '', email: '' });
 
-  // Fetch session data from backend
-  // frontend/src/components/AdminHeader.js
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch('/api/auth/user', { 
-          credentials: 'include' // Required for cookies/session
+        const response = await fetch('/api/auth/user', {
+          credentials: 'include', // Required for cookies
         });
         const data = await response.json();
+        console.log('Session data:', data); // Debug log
         setSession(data);
       } catch (error) {
         console.error('Error fetching session:', error);
@@ -23,14 +22,13 @@ export default function AdminHeader() {
   }, []);
 
   return (
-    <div className='h-16 px-4 flex justify-between items-center border-b border-gray-200' style={{ backgroundColor: 'var(--background-light)' }}>
-      {/* Left Section: Logo and Welcome Message */}
+    <div className='h-20 px-4 flex justify-between items-center border-b border-gray-200' style={{ backgroundColor: 'var(--background-light)' }}>
       <div className='flex items-center gap-4'>
-        <div className='text-lg font-semibold text-gray-800'>
-          <img src="/dist/assets/logo1.png" alt="" />
+        <div>
+          <img src="../assets/logo-no-title.png" alt="" width="30%" />
         </div>
-        <div className='text-sm text-gray-600'>
-          Welcome, <span className='font-medium text-gray-800'>{session.name}</span>!
+        <div className='text-2xl text-gray-600 font-bold'>
+          Welcome, <span className='font-black text-rose-400'>{session.name}</span>!
         </div>
       </div>
 
