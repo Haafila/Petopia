@@ -11,6 +11,30 @@ export const getProducts = async (req, res) => {
 	}
 };
 
+export const getProduct = async (req, res) => {
+	const { id } = req.params;
+  
+	// Check if the ID is valid
+	if (!mongoose.Types.ObjectId.isValid(id)) {
+	  return res.status(404).json({ success: false, message: "Invalid Product Id" });
+	}
+  
+	try {
+	  const product = await Product.findById(id);
+  
+	  // Check if the product exists
+	  if (!product) {
+		return res.status(404).json({ success: false, message: "Product not found" });
+	  }
+  
+	  res.status(200).json({ success: true, data: product });
+	} catch (error) {
+	  console.log("Error in fetching product:", error.message);
+	  res.status(500).json({ success: false, message: "Server Error" });
+	}
+};
+  
+
 export const createProduct = async (req, res) => {
 	const product = req.body; // user will send this data
 

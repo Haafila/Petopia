@@ -11,7 +11,8 @@ const productSchema = new mongoose.Schema(
         },
         category: { 
             type: String, 
-            required: true 
+            required: true, 
+            enum: ['Accessories', 'Toys', 'Housing', 'Food', 'Health', 'Others'] 
         },
         price: { 
             type: Number, 
@@ -25,7 +26,6 @@ const productSchema = new mongoose.Schema(
             type: String, 
             required: true 
         }, 
-  
     },
     {
         timestamps: true, // createdAt, updatedAt
