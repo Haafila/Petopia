@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useState } from "react"; // To manage the toggle state
-import { FaBox, FaClipboardList, FaBars, FaTachometerAlt, FaUsers, FaPaw, FaCalendarAlt, FaDollarSign, FaQuestionCircle, FaSignOutAlt } from "react-icons/fa"; // Import icons
+import { FaClipboardList, FaBars, FaPaw, FaCalendarAlt, FaQuestionCircle, FaSignOutAlt, FaUser, FaShoppingCart, FaHeart } from "react-icons/fa"; // Import icons
 import { IoPawSharp } from "react-icons/io5";
 
-const AdminSideBar = () => {
+const CustomerSideBar = () => {
   const [isOpen, setIsOpen] = useState(true); // State to manage navbar open/close
 
   const toggleNavbar = () => setIsOpen(!isOpen); // Toggle function for the navbar
@@ -33,77 +33,69 @@ const AdminSideBar = () => {
             {/* Links */}
             <ul className="space-y-4">
                 <li>
-                <Link
-                    to="/dashboard"
+                    <Link
+                    to="/account"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaTachometerAlt className="mr-3" /> : <FaTachometerAlt />} {isOpen && "Dashboard"}
-                </Link>
+                    >
+                    {isOpen ? <FaUser className="mr-3" /> : <FaUser />} {isOpen && "My Account"}
+                    </Link>
                 </li>
                 <li>
-                <Link
-                    to="/users"
+                    <Link
+                    to="/mypets"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaUsers className="mr-3" /> : <FaUsers />} {isOpen && "Users"}
-                </Link>
+                    >
+                    {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "My Pets"}
+                    </Link>
                 </li>
                 <li>
-                <Link
-                    to="/pets"
+                    <Link
+                    to="/customer/products"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "Pets"}
-                </Link>
+                    >
+                    {isOpen ? <FaShoppingCart className="mr-3" /> : <FaShoppingCart />} {isOpen && "Shop Now"}
+                    </Link>
                 </li>
                 <li>
-                <Link
-                    to="/appointments"
+                    <Link
+                    to="/appointment"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaCalendarAlt className="mr-3" /> : <FaCalendarAlt />} {isOpen && "Appointments"}
-                </Link>
+                    >
+                    {isOpen ? <FaCalendarAlt className="mr-3" /> : <FaCalendarAlt />} {isOpen && "Book an Appointment"}
+                    </Link>
                 </li>
                 <li>
-                <Link
-                    to="/products"
+                    <Link
+                    to="/adopt"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaBox className="mr-3" /> : <FaBox />} {isOpen && "Products"}
-                </Link>
+                    >
+                    {isOpen ? <FaHeart className="mr-3" /> : <FaHeart />} {isOpen && "Adopt a Friend"}
+                    </Link>
                 </li>
                 <li>
-                <Link
+                    <Link
                     to="/orders"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaClipboardList className="mr-3" /> : <FaClipboardList />} {isOpen && "Orders"}
-                </Link>
-                </li>
-                <li>
-                <Link
-                    to="/finance"
-                    className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaDollarSign className="mr-3" /> : <FaDollarSign />} {isOpen && "Finance"}
-                </Link>
+                    >
+                    {isOpen ? <FaClipboardList className="mr-3" /> : <FaClipboardList />} {isOpen && "My Orders"}
+                    </Link>
                 </li>
                 <hr className="border-t border-gray-600 my-4" />
                 <li>
-                <Link
+                    <Link
                     to="/help"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
+                    >
                     {isOpen ? <FaQuestionCircle className="mr-3" /> : <FaQuestionCircle />} {isOpen && "Help & Support"}
-                </Link>
+                    </Link>
                 </li>
                 <li>
-                <Link
+                    <Link
                     to="/logout"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
+                    >
                     {isOpen ? <FaSignOutAlt className="mr-3" /> : <FaSignOutAlt />} {isOpen && "Logout"}
-                </Link>
+                    </Link>
                 </li>
             </ul>
         </div>
@@ -111,4 +103,4 @@ const AdminSideBar = () => {
   );
 };
 
-export default AdminSideBar;
+export default CustomerSideBar;

@@ -20,7 +20,7 @@ const ProductCard = ({ product }) => {  // Change "Product" to lowercase "produc
           Add to Cart
         </button>
         <Link 
-          to={`/admin/products/${product._id}`}
+          to={`/customer/products/${product._id}`}
           className="text-rose-500 hover:underline"
         >
           View Details
