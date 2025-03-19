@@ -71,7 +71,7 @@ const ProductDetailsPage = () => {
             </button>
           </div>
 
-          <Link to="/admin/products" className="text-blue-500 hover:underline">
+          <Link to="/customer/products" className="text-blue-500 hover:underline">
             &larr; Back to Products
           </Link>
         </div>

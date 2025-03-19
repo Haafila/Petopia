@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { HiOutlineBell, HiOutlineChatAlt, HiOutlineSearch } from 'react-icons/hi';
 import { Popover, Transition } from '@headlessui/react';
 
-export default function AdminHeader() {
+export default function DashboardHeader() {
   const [session, setSession] = useState({ name: '', email: '' });
 
   useEffect(() => {

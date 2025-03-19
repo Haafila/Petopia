@@ -53,9 +53,8 @@ const ProductsShopPage = () => {
 
                 {/* Cart Icon */}
                 <div className="flex items-center space-x-4">
-                    <button className="flex items-center text-xl text-pink-950 hover:text-rose-400">
-                        <FaShoppingCart className="mr-5 text-4xl text-pink-950 stroke-white stroke-5" />
-                        <span>Cart</span>
+                    <button className="flex items-center text-xl text-white hover:bg-pink-400 bg-pink-800 p-3 rounded-lg">
+                        <FaShoppingCart className="mr-5 text-4xl text-white stroke-white stroke-5" />
                     </button>
                 </div>
             </div>
