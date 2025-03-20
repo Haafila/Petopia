@@ -1,34 +1,34 @@
 import Order from "../models/order.model.js";
-import Product from "../models/product.model.js";
+import Cart from "../models/cart.model.js";
 
+// Place an order
 export const placeOrder = async (req, res) => {
   try {
     if (!req.session.user) {
-      return res.status(401).json({ error: "User not logged in" });
+      return res.status(401).json({ success: false, message: "User not logged in" });
     }
 
-    const { products, deliveryDetails, paymentMethod } = req.body;
+    // Find the user's cart
+    const cart = await Cart.findOne({ user: req.session.user._id }).populate(
+      "items.product",
+      "name price"
+    );
 
-    // Validate inputs (unchanged)
-    if (!products || products.length === 0) {
-      return res.status(400).json({ error: "Cart is empty" });
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ success: false, message: "Cart is empty" });
     }
 
     let totalAmount = 0;
 
-    // Debug: Log the request body
-    console.log("Products in Request:", JSON.stringify(products, null, 2));
-
-    for (let item of products) {
-      const product = await Product.findById(item.product);
+    // Calculate the total amount and validate products
+    for (let item of cart.items) {
+      const product = item.product;
       if (!product) {
-        return res.status(404).json({ error: `Product with ID ${item.product} not found` });
+        return res.status(404).json({
+          success: false,
+          message: `Product with ID ${item.product} not found`,
+        });
       }
-
-      // Debug: Log product details
-      console.log(
-        `Calculating: ${product.name} (Quantity: ${item.quantity}, Price: ${product.price})`
-      );
 
       // Calculate subtotal with 2 decimal places
       const subtotal = parseFloat((item.quantity * product.price).toFixed(2));
@@ -38,24 +38,32 @@ export const placeOrder = async (req, res) => {
     // Round the final total to 2 decimal places
     totalAmount = parseFloat(totalAmount.toFixed(2));
 
-    console.log("Final Total Amount:", totalAmount); // Debug
-
-    // Create and save order (unchanged)
+    // Create and save the order
     const newOrder = new Order({
       user: req.session.user._id,
-      products,
+      products: cart.items.map((item) => ({
+        product: item.product._id,
+        quantity: item.quantity,
+      })),
       totalAmount,
-      paymentMethod,
-      deliveryDetails,
+      paymentMethod: req.body.paymentMethod, // Payment method from request body
+      deliveryDetails: req.body.deliveryDetails, // Delivery details from request body
     });
 
     await newOrder.save();
 
-    res.status(201).json({ message: "Order placed successfully!", order: newOrder });
+    // Clear the user's cart after placing the order
+    cart.items = [];
+    await cart.save();
 
+    res.status(201).json({
+      success: true,
+      message: "Order placed successfully!",
+      data: newOrder,
+    });
   } catch (error) {
-    console.error("Error placing order:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error placing order:", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
