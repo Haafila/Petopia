@@ -11,15 +11,14 @@ const ProductsShopPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 6; // Adjust this number to control products per page
+    const itemsPerPage = 6; 
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 const response = await axios.get('/api/products'); 
-                console.log("API Response:", response.data); // Debugging
+                console.log("API Response:", response.data); // for debugging
                 if (response.data && Array.isArray(response.data.data)) {
                     setProducts(response.data.data);
                 } else {
@@ -76,7 +75,7 @@ const ProductsShopPage = () => {
                         key={category}
                         onClick={() => {
                             setSelectedCategory(category);
-                            setCurrentPage(0); // Reset to first page when category changes
+                            setCurrentPage(0);
                         }}
                         className={`px-4 py-2 rounded ${
                             selectedCategory === category

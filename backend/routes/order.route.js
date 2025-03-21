@@ -1,5 +1,5 @@
 import express from "express";
-import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, getOrderDetails, cancelOrder } from "../controllers/order.controller.js";
+import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder } from "../controllers/order.controller.js";
 import sessionAuth from "../middleware/session.auth.js";
 
 const router = express.Router();
@@ -12,6 +12,8 @@ router.put("/:orderId/cancel", cancelOrder);
 
 // Admin Routes
 router.get("/", getAllOrders);
+router.put("/:id", updateOrder);
+router.delete("/:id", deleteOrder);
 // Update order status
 router.patch("/:orderId/status", updateOrderStatus);
 // Update payment status

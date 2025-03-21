@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import axios from 'axios'; 
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -13,8 +14,30 @@ const CheckoutPage = () => {
     postalCode: '',
     phone: ''
   });
+  const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = 'Full Name is required';
+      toast.warn('Full Name is required');
+    }
+    if (!formData.address.trim()) {
+      newErrors.address = 'Address is required';
+      toast.warn('Address is required');
+    }
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.postalCode.match(/^[0-9]{5}$/)) newErrors.postalCode = 'Enter a valid 5-digit postal code';
+    if (!formData.phone.match(/^\d{10}$/)) newErrors.phone = 'Enter a valid 10-digit phone number';
+    if (!paymentMethod) {
+      newErrors.paymentMethod = 'Please select a payment method';
+      toast.warn('Please select a payment method');
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,60 +45,44 @@ const CheckoutPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    if (!cart?.items?.length) {
-      alert("Your cart is empty.");
-      return;
-    }
-
-    // Get user from your existing session handling
-    const sessionUser = { _id: '67d7dda581850a0c88ab9b77' }; // Replace with your actual session user
-
+    const sessionUser = { _id: '67d7dda581850a0c88ab9b77' };
     const orderData = {
-      user: sessionUser._id, // Add user ID from session
+      user: sessionUser._id,
       products: cart.items.map(item => ({
-        product: item.product._id, // Send just product ID
+        product: item.product._id,
         quantity: item.quantity
       })),
       totalAmount: cartTotal,
-      paymentMethod: paymentMethod, // Add payment method
-      paymentStatus: "Pending",
-      status: "Pending", // Add order status
-      deliveryDetails: {
-        name: formData.name, // Name moved here from root
-        address: formData.address,
-        city: formData.city,
-        postalCode: formData.postalCode, // Correct field name
-        phone: formData.phone
-      }
+      paymentMethod,
+      paymentStatus: 'Pending',
+      status: 'Pending',
+      deliveryDetails: { ...formData }
     };
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post("/api/orders/place-order", orderData);
-      await clearCart(); // Wait for cart to clear
-      alert("Order placed successfully!");
-      navigate('/customer/products'); // Redirect after success
+      await axios.post('/api/orders/place-order', orderData);
+      await clearCart();
+      toast.success('Order placed successfully!');
+      navigate('/customer/products');
     } catch (error) {
-      console.error("Order error:", error.response?.data || error.message);
-      alert(`Failed to place order: ${error.response?.data?.message || error.message}`);
-      navigate('/customer/products'); // Redirect even on error
+      toast.warn(`Failed to place order: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h2 className="text-2xl font-extrabold mb-4">Checkout</h2>
-
-      {/* Prevent checkout if cart is empty */}
+    <div className="container mx-auto px-4 py-8 max-w-2xl bg-[var(--background-light)] p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-extrabold mb-4 text-[var(--dark-brown)]">Checkout</h2>
       {cart?.items?.length === 0 ? (
-        <p className="text-red-500">Your cart is empty. <a href="/customer/products" className="text-blue-500 underline">Go to shop</a></p>
+        <p className="text-red-500">Your cart is empty. <a href="/customer/products" className="text-[var(--main-color)] underline">Go to shop</a></p>
       ) : (
         <>
-          <h3 className="text-xl font-semibold">Order Summary</h3>
-          <ul className="border rounded p-4 mb-4">
+          <h3 className="text-xl font-semibold text-[var(--dark-brown)]">Order Summary</h3>
+          <ul className="border rounded p-4 mb-4 bg-[var(--light-grey)]">
             {cart.items.map(item => (
               <li key={item.product._id} className="flex justify-between py-2 border-b">
                 <span>{item.product.name} x {item.quantity}</span>
@@ -89,36 +96,24 @@ const CheckoutPage = () => {
           </ul>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Delivery Details */}
-            <h3 className="text-lg font-semibold">Delivery Details</h3>
-            <input type="text" name="name" placeholder="Full Name" className="w-full p-2 border rounded" onChange={handleChange} required />
-            <input type="text" name="address" placeholder="Address" className="w-full p-2 border rounded" onChange={handleChange} required />
-            <input type="text" name="city" placeholder="City" className="w-full p-2 border rounded" onChange={handleChange} required />
-            <input type="text" name="postalCode" placeholder="Postal Code" className="w-full p-2 border rounded" onChange={handleChange} required />
-            <input type="tel" name="phone" placeholder="Phone Number" className="w-full p-2 border rounded" onChange={handleChange} required />
+            <h3 className="text-lg font-semibold text-[var(--dark-brown)]">Delivery Details</h3>
+            {['name', 'address', 'city', 'postalCode', 'phone'].map(field => (
+              <div key={field}>
+                <input type="text" name={field} placeholder={field.charAt(0).toUpperCase() + field.slice(1)} 
+                  className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
+                {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+              </div>
+            ))}
 
-            {/* Payment Method Selection */}
-            <h3 className="text-lg font-semibold">Payment Method</h3>
+            <h3 className="text-lg font-semibold text-[var(--dark-brown)]">Payment Method</h3>
             <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('Cash on Delivery')}
-                className={`px-4 py-2 rounded ${
-                  paymentMethod === 'Cash on Delivery' 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-gray-200 hover:bg-gray-300'
-                }`}
-              >
-                Cash on Delivery
-              </button>
+              <button type="button" onClick={() => setPaymentMethod('Cash on Delivery')}
+                className={`px-4 py-2 rounded ${paymentMethod === 'Cash on Delivery' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Cash on Delivery</button>
             </div>
+            {errors.paymentMethod && <p className="text-red-500 text-sm">{errors.paymentMethod}</p>}
 
-            {/* Submit Order Button */}
-            <button
-              type="submit"
-              disabled={!paymentMethod || isSubmitting}
-              className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600 disabled:bg-gray-400"
-            >
+            <button type="submit" disabled={!paymentMethod || isSubmitting} 
+              className="w-full bg-[var(--main-color)] text-white py-3 rounded hover:bg-[var(--light-purple)] disabled:bg-[var(--grey)]">
               {isSubmitting ? 'Placing Order...' : 'Place Order'}
             </button>
           </form>

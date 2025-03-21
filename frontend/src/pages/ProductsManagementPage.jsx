@@ -3,15 +3,17 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
 import ProductForm from '../components/ProductForm';
+import { useConfirmDialog } from '../components/ConfirmDialog';
 
 const ProductManagementPage = () => {
     const [products, setProducts] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const { openConfirmDialog } = useConfirmDialog();
     
     // Pagination state
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 7; 
+    const itemsPerPage = 6; 
 
     useEffect(() => {
         fetchProducts();
@@ -27,13 +29,20 @@ const ProductManagementPage = () => {
     };
 
     const handleDelete = async (id) => {
-        try {
-            await axios.delete(`/api/products/${id}`);
-            toast.success('Product deleted successfully');
-            fetchProducts();
-        } catch (error) {
-            toast.error('Failed to delete product');
-        }
+        openConfirmDialog({
+            title: 'Delete Product',
+            message: 'Are you sure you want to delete this product?',
+            confirmText: 'Delete',
+            onConfirm: async () => {
+                try {
+                    await axios.delete(`/api/products/${id}`);
+                    toast.success('Product deleted successfully');
+                    fetchProducts();
+                } catch (error) {
+                    toast.error('Failed to delete product');
+                }
+            }
+        });
     };
 
     const handleEdit = (product) => {
@@ -92,31 +101,31 @@ const ProductManagementPage = () => {
             )}
 
             <div className="overflow-x-container h-100 mx-auto p-2">
-                <table className="min-w-full bg-white border text-sm">
-                    <thead>
+                <table className="min-w-full divide-y divide-pink-200 border border-pink-300 rounded-full">
+                    <thead className="bg-pink-50">
                         <tr>
-                            <th className="px-4 py-2 border w-35">Name</th>
-                            <th className="px-4 py-2 border w-7">Price (LKR)</th>
-                            <th className="px-4 py-2 border">Category</th>
-                            <th className="px-4 py-2 border">Quantity</th>
-                            <th className="px-4 py-2 border">Image</th>
-                            <th className="px-4 py-2 border">Created At</th>
-                            <th className="px-4 py-2 border">Updated At</th>
-                            <th className="px-4 py-2 border">Actions</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (LKR)</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated At</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-white divide-y divide-pink-200">
                         {currentProducts.length > 0 ? (
                             currentProducts.map((product) => (
-                                <tr key={product._id}>
-                                    <td className="px-4 py-2 border">{product.name}</td>
-                                    <td className="px-4 py-2 border">{product.price.toFixed(2)}</td>
-                                    <td className="px-4 py-2 border">{product.category}</td>
-                                    <td className="px-4 py-2 border">{product.quantity}</td>
-                                    <td className="px-4 py-2 border"><a href={product.imageUrl} target="_blank" rel="noopener noreferrer" className='text-pink-400'>View Image</a></td>
-                                    <td className="px-4 py-2 border">{new Date(product.createdAt).toLocaleString()}</td>
-                                    <td className="px-4 py-2 border">{new Date(product.updatedAt).toLocaleString()}</td>
-                                    <td className="px-4 py-2 border">
+                                <tr key={product._id} className="hover:bg-pink-50">
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{product.name}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{product.price.toFixed(2)}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{product.category}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{product.quantity}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium"><a href={product.imageUrl} target="_blank" rel="noopener noreferrer" className='text-pink-400'>View Image</a></td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{new Date(product.createdAt).toLocaleString()}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{new Date(product.updatedAt).toLocaleString()}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                         <button
                                             onClick={() => handleEdit(product)}
                                             className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600"

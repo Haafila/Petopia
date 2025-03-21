@@ -1,5 +1,6 @@
 import React, { useState } from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import Login from './components/Login';
 import AdminDashboardLayout from './layouts/AdminDashboardLayout';
 import CustomerDashboardLayout from './layouts/CustomerDashboardLayout';
@@ -10,6 +11,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ProductManagementPage from './pages/ProductsManagementPage';
 import OrderManagementPage from './pages/OrdersManagementPage';
+import UserOrdersPage from './pages/UserOrdersPage';
 
 function App() {
   const [cartData] = useState([]); 
@@ -34,6 +36,7 @@ function App() {
         <Route path="products/cart" element={<CartPage />} />
         <Route path="products/:id" element={<ProductDetailsPage />} /> 
         <Route path="products/checkout" element={<CheckoutPage cartItems={cartData} />} />
+        <Route path="orders" element={<UserOrdersPage />} />
       </Route>
     </Routes>
   );
