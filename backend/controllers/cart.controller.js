@@ -1,5 +1,30 @@
+import mongoose from 'mongoose';
 import Cart from '../models/cart.model.js';
 import Product from '../models/product.model.js';
+
+export const clearCart = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.status(401).json({ success: false, message: "User not logged in" });
+    }
+
+    // Find and update the cart
+    const cart = await Cart.findOneAndUpdate(
+      { user: req.session.user._id },
+      { $set: { items: [] } }, // Clear all items
+      { new: true }
+    ).populate("items.product", "name price images");
+
+    if (!cart) {
+      return res.status(404).json({ success: false, message: "Cart not found" });
+    }
+
+    res.status(200).json({ success: true, data: cart });
+  } catch (err) {
+    console.error("Error clearing cart:", err.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
 
 export const getCart = async (req, res) => {
   try {
@@ -87,7 +112,6 @@ export const addToCart = async (req, res) => {
     }
 };
 
-// Remove item from cart
 export const removeFromCart = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -105,7 +129,11 @@ export const removeFromCart = async (req, res) => {
     );
 
     await cart.save();
-    res.status(200).json({ success: true, data: cart });
+
+    // Fetch updated cart with populated product details
+    const updatedCart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
+
+    res.status(200).json({ success: true, data: updatedCart });
   } catch (err) {
     console.error("Error removing from cart:", err.message);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -113,47 +141,35 @@ export const removeFromCart = async (req, res) => {
 };
 
 export const updateCartItem = async (req, res) => {
-    const { quantity } = req.body;
-    const { itemId } = req.params;
-  
-    console.log("Updating cart item. Item ID:", itemId); // Debug log
-    console.log("New quantity:", quantity); // Debug log
-  
-    try {
+  const { quantity } = req.body;
+  const { itemId } = req.params;
+
+  try {
       if (!req.session.user) {
-        console.log("User not logged in"); // Debug log
-        return res.status(401).json({ error: "User not logged in" });
+          return res.status(401).json({ error: "User not logged in" });
       }
-  
-      console.log("User is logged in. User ID:", req.session.user._id); // Debug log
-  
-      // Find the user's cart
-      const cart = await Cart.findOne({ user: req.session.user._id });
-      console.log("Cart found:", cart); // Debug log
-  
+
+      const cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
+
       if (!cart) {
-        console.log("Cart not found for user:", req.session.user._id); // Debug log
-        return res.status(404).json({ success: false, message: "Cart not found" });
+          return res.status(404).json({ success: false, message: "Cart not found" });
       }
-  
-      // Find the item in the cart
+
       const item = cart.items.find((item) => item._id.toString() === itemId);
-      console.log("Item found:", item); // Debug log
-  
+
       if (!item) {
-        console.log("Item not found in cart:", itemId); // Debug log
-        return res.status(404).json({ success: false, message: "Item not found in cart" });
+          return res.status(404).json({ success: false, message: "Item not found in cart" });
       }
-  
-      // Update the quantity
+
       item.quantity = quantity;
       await cart.save();
-  
-      console.log("Cart item updated successfully"); // Debug log
-      res.status(200).json({ success: true, data: cart });
-    } catch (err) {
-      console.error("Error updating cart item:", err.message); // Debug log
-      res.status(500).json({ success: false, message: "Server Error" });
-    }
-  };
 
+      // Re-fetch the cart with product details populated
+      const updatedCart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
+
+      res.status(200).json({ success: true, data: updatedCart });
+  } catch (err) {
+      console.error("Error updating cart item:", err.message);
+      res.status(500).json({ success: false, message: "Server Error" });
+  }
+};

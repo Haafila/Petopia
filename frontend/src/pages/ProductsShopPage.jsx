@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 
-import { FaShoppingCart } from 'react-icons/fa'; 
+import CartButton from '../components/CartButton';
 
 const ProductsShopPage = () => {
     const [products, setProducts] = useState([]);
@@ -24,7 +24,7 @@ const ProductsShopPage = () => {
             } catch (error) {
                 console.error("Error fetching products:", error);
             } finally {
-                setLoading(false); // Make sure loading state is updated
+                setLoading(false); 
             }
         };
 
@@ -50,13 +50,7 @@ const ProductsShopPage = () => {
             }}>
             <div className="flex justify-between items-center w-full mt-auto">
                 <h1 className="text-5xl font-extrabold text-pink-950">Petopia Pet Shop</h1>
-
-                {/* Cart Icon */}
-                <div className="flex items-center space-x-4">
-                    <button className="flex items-center text-xl text-white hover:bg-pink-400 bg-pink-800 p-3 rounded-lg">
-                        <FaShoppingCart className="mr-5 text-4xl text-white stroke-white stroke-5" />
-                    </button>
-                </div>
+                <CartButton />
             </div>
         </div>
             {/* Category Filter */}

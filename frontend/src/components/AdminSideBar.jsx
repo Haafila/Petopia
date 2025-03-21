@@ -66,7 +66,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/products"
+                    to="/admin/products"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaBox className="mr-3" /> : <FaBox />} {isOpen && "Products"}
@@ -74,7 +74,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/orders"
+                    to="/admin/orders"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaClipboardList className="mr-3" /> : <FaClipboardList />} {isOpen && "Orders"}

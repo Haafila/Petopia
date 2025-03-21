@@ -8,62 +8,80 @@ export const placeOrder = async (req, res) => {
       return res.status(401).json({ success: false, message: "User not logged in" });
     }
 
-    // Find the user's cart
-    const cart = await Cart.findOne({ user: req.session.user._id }).populate(
-      "items.product",
-      "name price"
-    );
+    const cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product", "name price quantity");
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
 
-    let totalAmount = 0;
+    if (!req.body.paymentMethod || !req.body.deliveryDetails) {
+      return res.status(400).json({ success: false, message: "Missing payment method or delivery details" });
+    }
 
-    // Calculate the total amount and validate products
+    let totalAmount = 0;
     for (let item of cart.items) {
       const product = item.product;
       if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: `Product with ID ${item.product} not found`,
-        });
+        return res.status(404).json({ success: false, message: `Product not found` });
       }
-
-      // Calculate subtotal with 2 decimal places
-      const subtotal = parseFloat((item.quantity * product.price).toFixed(2));
-      totalAmount += subtotal;
+      if (product.quantity < item.quantity) {
+        return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });
+      }
+      totalAmount += parseFloat((item.quantity * product.price).toFixed(2));
+      product.quantity -= item.quantity; // Deduct quantity
+      await product.save();
     }
-
-    // Round the final total to 2 decimal places
     totalAmount = parseFloat(totalAmount.toFixed(2));
 
-    // Create and save the order
     const newOrder = new Order({
       user: req.session.user._id,
-      products: cart.items.map((item) => ({
-        product: item.product._id,
-        quantity: item.quantity,
-      })),
+      products: cart.items.map((item) => ({ product: item.product._id, quantity: item.quantity })),
       totalAmount,
-      paymentMethod: req.body.paymentMethod, // Payment method from request body
-      deliveryDetails: req.body.deliveryDetails, // Delivery details from request body
+      paymentMethod: req.body.paymentMethod,
+      deliveryDetails: req.body.deliveryDetails,
     });
 
     await newOrder.save();
-
-    // Clear the user's cart after placing the order
     cart.items = [];
     await cart.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Order placed successfully!",
-      data: newOrder,
-    });
+    res.status(201).json({ success: true, message: "Order placed successfully!", data: newOrder });
   } catch (error) {
     console.error("Error placing order:", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// Get order details
+export const getOrderDetails = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId).populate("products.product").populate("user", "name email");
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+    res.json(order);
+  } catch (error) {
+    console.error("Error fetching order details:", error.message);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// Cancel order
+export const cancelOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    if (order.status !== "Pending") {
+      return res.status(400).json({ success: false, message: "Order cannot be canceled at this stage" });
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+    res.json({ success: true, message: "Order cancelled successfully", order });
+  } catch (error) {
+    console.error("Error cancelling order:", error.message);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
