@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import AddToCartButton from './AddToCartButton';
+
 const ProductCard = ({ product }) => {  // Change "Product" to lowercase "product"
   return (
     <div className="border rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
@@ -13,16 +15,9 @@ const ProductCard = ({ product }) => {  // Change "Product" to lowercase "produc
       <p className="text-gray-600 mb-2">LKR {product.price.toFixed(2)}</p>
       
       <div className="flex justify-between items-center">
-        <button 
-          className="bg-rose-400 text-white px-4 py-2 rounded hover:bg-rose-600 transition-colors"
-          onClick={() => console.log('Add to cart:', product._id)}  // Update references to product
-        >
-          Add to Cart
-        </button>
-        <Link 
-          to={`/customer/products/${product._id}`}
-          className="text-rose-500 hover:underline"
-        >
+        <AddToCartButton productId={product._id} quantity={1} />
+        
+        <Link to={`/customer/products/${product._id}`} className="text-rose-500 hover:underline">
           View Details
         </Link>
       </div>

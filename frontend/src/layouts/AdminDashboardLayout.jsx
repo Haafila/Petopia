@@ -9,7 +9,7 @@ const AdminDashboardLayout = () => {
       <DashboardHeader />
       <div className="flex flex-1 overflow-hidden">
         <AdminSideBar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto p-3">
           <Outlet /> 
         </main>
       </div>

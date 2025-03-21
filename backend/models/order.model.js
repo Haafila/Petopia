@@ -43,11 +43,12 @@ const orderSchema = new mongoose.Schema(
 
         paymentMethod: { 
             type: String, 
-            enum: ["Online Payment", "Cash on Delivery"], 
+            enum: ["Card", "Cash on Delivery"], 
             required: true 
         },
 
         deliveryDetails: {
+            name: { type: String, required:true },
             address: { type: String, required: true },
             city: { type: String, required: true },
             postalCode: { type: String, required: true },

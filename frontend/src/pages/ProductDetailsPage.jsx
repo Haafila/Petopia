@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
+import AddToCartButton from '../components/AddToCartButton';
+
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -60,18 +62,13 @@ const ProductDetailsPage = () => {
           </div>
 
           <div className="flex gap-4">
-            <button
-              onClick={() => addToCart(product, parseInt(quantity))}
-              className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600"
-            >
-              Add to Cart
-            </button>
+            <AddToCartButton productId={product._id} quantity={quantity} />
             <button className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600">
               Buy Now
             </button>
           </div>
 
-          <Link to="/customer/products" className="text-blue-500 hover:underline">
+          <Link to="/customer/products" className="text-rose-400 hover:underline">
             &larr; Back to Products
           </Link>
         </div>

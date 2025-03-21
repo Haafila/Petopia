@@ -74,7 +74,7 @@ const CustomerSideBar = () => {
                 </li>
                 <li>
                     <Link
-                    to="/orders"
+                    to="/customer/orders"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                     >
                     {isOpen ? <FaClipboardList className="mr-3" /> : <FaClipboardList />} {isOpen && "My Orders"}
