@@ -27,7 +27,7 @@ const Login = () => {
       }
 
       // If login successful, redirect to admin dashboard
-      navigate('/customer/dashboard');
+      navigate('/admin/dashboard');
       
     } catch (err) {
       setError(err.message);
