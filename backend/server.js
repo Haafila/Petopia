@@ -8,6 +8,10 @@ import productRoutes from './routes/product.route.js';
 import orderRoutes from './routes/order.route.js';  
 import cartRoutes from './routes/cart.route.js';
 import authRoutes from './routes/auth.route.js';
+//pet route
+//adopt route
+//appointment route
+//finance route
 
 dotenv.config();
 
@@ -34,7 +38,11 @@ app.use("/api/auth", authRoutes);
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/cart', cartRoutes)
+app.use('/api/cart', cartRoutes);
+//app.use('/api/pet', authRoutes);
+//app.use('/api/adopt', authRoutes);
+//app.use('/api/appointment', authRoutes);
+//app.use('/api/finance', authRoutes);
 
 app.listen(PORT, () => {
     connectDB();
