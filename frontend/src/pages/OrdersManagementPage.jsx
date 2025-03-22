@@ -17,7 +17,7 @@ const OrderManagementPage = () => {
     
     // Pagination state
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 6; 
+    const itemsPerPage = 5; 
 
     useEffect(() => {
         fetchOrders();
@@ -157,7 +157,7 @@ const OrderManagementPage = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container h-100 mx-auto px-6 py-8 mx-auto">
             <h1 className="text-3xl font-extrabold mb-4">Order Management</h1>
 
             {isFormOpen && (
@@ -279,7 +279,7 @@ const OrderManagementPage = () => {
 
             {/* Pagination Component */}
             {orders && orders.length > itemsPerPage && (
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-4">
                     <ReactPaginate
                         previousLabel={"← Previous"}
                         nextLabel={"Next →"}

@@ -77,7 +77,7 @@ const ProductManagementPage = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container h-100 mx-auto px-6 py-8 mx-auto">
             <h1 className="text-3xl font-extrabold mb-4">Product Management</h1>
 
             <button
@@ -100,7 +100,7 @@ const ProductManagementPage = () => {
                 </div>
             )}
 
-            <div className="overflow-x-container h-100 mx-auto p-2">
+            <div className="overflow-x-auto bg-white rounded-lg shadow">
                 <table className="min-w-full divide-y divide-pink-200 border border-pink-300 rounded-full">
                     <thead className="bg-pink-50">
                         <tr>
@@ -154,7 +154,7 @@ const ProductManagementPage = () => {
 
             {/* Pagination Component */}
             {products.length > itemsPerPage && (
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-4">
                     <ReactPaginate
                         previousLabel={"← Previous"}
                         nextLabel={"Next →"}

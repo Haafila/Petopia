@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 import AddToCartButton from '../components/AddToCartButton';
+import CartButton from '../components/CartButton';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -30,6 +31,9 @@ const ProductDetailsPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-end mb-4 py-8">
+        <CartButton />
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         {/* Image Section */}
         <div>

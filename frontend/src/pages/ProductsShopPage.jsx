@@ -12,7 +12,7 @@ const ProductsShopPage = () => {
     const [error, setError] = useState(null);
     
     const [currentPage, setCurrentPage] = useState(0);
-    const itemsPerPage = 6; 
+    const itemsPerPage = 8; 
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -89,7 +89,7 @@ const ProductsShopPage = () => {
             </div>
 
             {/* Product Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {currentProducts.map(product => (
                     <ProductCard key={product._id} product={product} />
                 ))}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react"; // To manage the toggle state
+import { useState } from "react"; 
 import { FaBox, FaClipboardList, FaBars, FaTachometerAlt, FaUsers, FaPaw, FaCalendarAlt, FaDollarSign, FaQuestionCircle, FaSignOutAlt } from "react-icons/fa"; // Import icons
 import { IoPawSharp } from "react-icons/io5";
 
@@ -9,7 +9,7 @@ const AdminSideBar = () => {
   const toggleNavbar = () => setIsOpen(!isOpen); // Toggle function for the navbar
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-147">
         {/* Sidebar (Vertical Navbar) */}
         <div className={`p-5 space-y-6 transition-all duration-400 ${isOpen ? "w-65" : "w-18"}`} style={{ backgroundColor: 'var(--dark-brown)' }}>
             {/* Brand with Toggle Button */}

@@ -61,7 +61,7 @@ const UserOrdersPage = () => {
   }
 
   return (
-    <div className="container h-100 mx-auto px-20 py-8 my-auto">
+    <div className="container h-100 mx-auto px-20 py-8 mx-auto">
       <h2 className="text-3xl font-extrabold mb-6">My Orders</h2>
       <div className="space-y-6">
         {orders.map((order) => (
@@ -100,7 +100,7 @@ const UserOrdersPage = () => {
               </ul>
             </div>
             <div className="flex justify-between items-center border-t pt-4 mt-4">
-              <p className="font-semibold text-lg">Total: LKR{order.totalAmount?.toFixed(2)}</p>
+              <p className="font-semibold text-lg">Total: LKR {order.totalAmount?.toFixed(2)}</p>
               {order.status === 'Pending' && (
                 <button
                   onClick={() => handleCancelOrder(order._id)}

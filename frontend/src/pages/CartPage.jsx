@@ -33,7 +33,7 @@ const CartPage = () => {
   if (loading) return <p>Loading cart...</p>;
 
   return (
-    <div className="p-4 px-20">
+    <div className="container h-100 mx-auto px-6 py-8 mx-auto">
       <h2 className="text-2xl font-extrabold mb-4 flex items-center justify-between">
         <div className="flex items-center">
           Shopping Cart <span className="ml-2"><TiShoppingCart /></span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const AddToCartButton = ({ productId, quantity }) => {  // Accept quantity as a prop
   const handleAddToCart = async () => {
@@ -11,14 +12,14 @@ const AddToCartButton = ({ productId, quantity }) => {  // Accept quantity as a 
 
       if (response.data.success) {
         console.log('Added to cart:', productId, 'Quantity:', quantity);
-        alert('Product added to cart!');
+        toast.success('Product added to cart!');
       } else {
         console.error('Failed to add to cart:', response.data.message);
-        alert('Failed to add product to cart.');
+        toast.error('Failed to add product to cart.');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
     }
   };
 
