@@ -1,14 +1,14 @@
-import express from 'express';
-import authMiddleware from '../middleware/auth.middleware';
-import { getUserPets, addPet, getPet, updatePet, deletePet, uploadPet } from '../controllers/pet.controller';
+import express from "express";
+import * as petController from "./controller.js";
 
+import upload from "../../utils/upload.js";
 const router = express.Router();
 
-// All pet routes require login
-router.get('/', authMiddleware, getUserPets);
-router.post('/add', authMiddleware, uploadPet.single('image'), addPet);
-router.get('/:id', authMiddleware, getPet);
-router.put('/:id', authMiddleware, uploadPet.single('image'), updatePet);
-router.delete('/:id', authMiddleware, deletePet);
+router.post("/pets", upload.single("image"), petController.createPet);
+router.put("/pets/:id", upload.single("image"), petController.updatePet);
+router.get("/pets/:id", petController.getPetById);
+router.delete("/pets/:id", petController.deletePet);
+router.get("/pets", petController.getAllPets);
+router.get("/pets/owner/:ownerId", petController.getPetsByOwner);
 
 export default router;

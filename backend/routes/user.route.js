@@ -1,12 +1,12 @@
-import express from 'express';
-import authMiddleware from '../middleware/auth.middleware';
-import { getUser, updateUser, changePassword, upload } from '../controllers/user.controller';
-
+import express from "express";
+import * as userController from "./controller.js";
+import upload from "../../utils/upload.js";
 const router = express.Router();
 
-// All user routes require login
-router.get('/:id', authMiddleware, getUser);
-router.put('/:id', authMiddleware, upload.single('image'), updateUser);
-router.put('/:id/change-password', authMiddleware, changePassword);
-
+router.post("/users", upload.single("image"), userController.createUser);
+router.put("/users/:id", upload.single("image"), userController.updateUser);
+router.get("/users/:id", userController.getUserById);
+router.delete("/users/:id", userController.deleteUser);
+router.get("/users", userController.getAllUsers);
+router.post("/users/login", userController.loginUser);
 export default router;

@@ -1,93 +1,78 @@
-import User from '../models/user.model';
-import bcrypt from 'bcrypt';
-import multer from 'multer';
-import path from 'path';
+import * as userService from "../services/user.service.js";
 
-// Setup multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Store images in server/public/uploads
-    cb(null, "public/uploads");
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-export const upload = multer({ storage });
-
-// View user details
-export const getUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    if (userId !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, error: "Unauthorized" });
-    }
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
-    }
-    return res.status(200).json({ success: true, user });
+    const userData = {
+      ...req.body,
+      image: req.file ? `/public/uploads/${req.file.filename}` : null,
+    };
+    const user = await userService.createUser(userData);
+    res.status(201).json(user);
   } catch (error) {
-    console.error("Get User Error:", error);
-    return res.status(500).json({ success: false, error: "Get user server error" });
+    res.status(400).json({ message: error.message });
   }
 };
 
-// Update user details
 export const updateUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    if (userId !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, error: "Unauthorized" });
-    }
-
-    const { name, phone, email, address } = req.body;
-    const updateData = { name, phone, email, address };
-
-    // If user uploaded an image, add to update data
+    let userData = {
+      ...req.body,
+    };
     if (req.file) {
-      updateData.image = req.file.filename;
+      userData = {
+        ...req.body,
+        image: req.file ? `/public/uploads/${req.file.filename}` : null,
+      };
     }
-
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).select("-password");
-    if (!updatedUser) {
-      return res.status(404).json({ success: false, error: "User not found" });
+    const user = await userService.updateUser(req.params.id, userData);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-
-    return res.status(200).json({ success: true, message: "User updated", user: updatedUser });
+    res.status(200).json(user);
   } catch (error) {
-    console.error("Update User Error:", error);
-    return res.status(500).json({ success: false, error: "Update user server error" });
+    res.status(400).json({ message: error.message });
   }
 };
 
-// (Optional) Change password example
-export const changePassword = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
-    const userId = req.params.id;
-    if (userId !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, error: "Unauthorized" });
-    }
-
-    const { oldPassword, newPassword } = req.body;
-    const user = await User.findById(userId);
+    const user = await userService.getUserById(req.params.id);
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
-
-    const match = await bcrypt.compare(oldPassword, user.password);
-    if (!match) {
-      return res.status(400).json({ success: false, error: "Incorrect old password" });
-    }
-
-    const hashed = await bcrypt.hash(newPassword, 10);
-    user.password = hashed;
-    await user.save();
-
-    return res.status(200).json({ success: true, message: "Password changed" });
+    res.status(200).json(user);
   } catch (error) {
-    console.error("Change Password Error:", error);
-    return res.status(500).json({ success: false, error: "Change password server error" });
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await userService.deleteUser(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await userService.getAllUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await userService.loginUser(email, password);
+    res.status(200).json({ message: "Login successful", user });
+  } catch (error) {
+    res.status(401).json({ message: error.message });
   }
 };
