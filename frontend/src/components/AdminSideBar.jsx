@@ -9,7 +9,7 @@ const AdminSideBar = () => {
   const toggleNavbar = () => setIsOpen(!isOpen); // Toggle function for the navbar
 
   return (
-    <div className="flex h-147">
+    <div className="flex h-screen">
         {/* Sidebar (Vertical Navbar) */}
         <div className={`p-5 space-y-6 transition-all duration-400 ${isOpen ? "w-65" : "w-18"}`} style={{ backgroundColor: 'var(--dark-brown)' }}>
             {/* Brand with Toggle Button */}
