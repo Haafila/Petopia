@@ -12,6 +12,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import ProductManagementPage from './pages/ProductsManagementPage';
 import OrderManagementPage from './pages/OrdersManagementPage';
 import UserOrdersPage from './pages/UserOrdersPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const [cartData] = useState([]); 
@@ -19,8 +20,8 @@ function App() {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route path="/" element={<RegisterPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Login />} />
 
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminDashboardLayout />}>

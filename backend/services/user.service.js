@@ -1,5 +1,5 @@
-import User from "../models/user.modal.js";
-import bcrypt from "bcrypt";
+import User from "../models/user.model.js";
+
 export const createUser = async (userData) => {
   const user = new User(userData);
   return await user.save();
@@ -31,10 +31,11 @@ export const loginUser = async (email, password) => {
     throw new Error("User not found");
   }
 
-  const isPasswordValid = password === user.password;
-  if (!isPasswordValid) {
+  // Direct password comparison (not secure for production)
+  if (password !== user.password) {
     throw new Error("Invalid password");
   }
 
   return user;
 };
+

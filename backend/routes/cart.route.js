@@ -1,6 +1,6 @@
 import express from "express";
 import { getCart, addToCart, removeFromCart, updateCartItem, clearCart } from "../controllers/cart.controller.js";
-import sessionAuth from "../middleware/session.auth.js";
+import sessionAuth from "../middleware/auth.session.js";
 
 const router = express.Router();
 

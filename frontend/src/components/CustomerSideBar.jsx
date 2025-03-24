@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaClipboardList, FaBars, FaPaw, FaCalendarAlt, FaQuestionCircle, FaSignOutAlt, FaUser, FaShoppingCart, FaHeart, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaClipboardList, FaBars, FaPaw, FaCalendarAlt, FaQuestionCircle, FaUser, FaShoppingCart, FaHeart, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { IoPawSharp } from "react-icons/io5";
+import LogoutButton from "./LogoutButton";
 
 const CustomerSideBar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -81,9 +82,7 @@ const CustomerSideBar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/logout" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
-              {isOpen ? <FaSignOutAlt className="mr-3" /> : <FaSignOutAlt />} {isOpen && "Logout"}
-            </Link>
+            <LogoutButton isOpen={isOpen} />
           </li>
         </ul>
       </div>

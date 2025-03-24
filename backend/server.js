@@ -8,6 +8,7 @@ import productRoutes from './routes/product.route.js';
 import orderRoutes from './routes/order.route.js';  
 import cartRoutes from './routes/cart.route.js';
 import authRoutes from './routes/auth.route.js';
+import userRoutes from './routes/user.route.js';
 //pet route
 //adopt route
 //appointment route
@@ -35,6 +36,7 @@ app.use(session({
 }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);

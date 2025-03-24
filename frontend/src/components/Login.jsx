@@ -1,37 +1,45 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; 
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/users/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
+        credentials: "include", 
         body: JSON.stringify({ email, password }),
-        credentials: 'include' // Important for cookies
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || "Login failed");
       }
 
-      // If login successful, redirect to admin dashboard
-      navigate('/admin/dashboard');
-      
+      const { role } = data.user;
+
+      toast.success("Login successful!");
+
+      // Redirect based on user role
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (role === "customer") {
+        navigate("/customer/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
-      setError(err.message);
-      console.error('Login error:', err);
+      toast.error(err.message || "An error occurred during login");
+      console.error("Login error:", err);
     }
   };
 
@@ -43,7 +51,7 @@ const Login = () => {
             Login
           </h2>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
@@ -78,12 +86,6 @@ const Login = () => {
               />
             </div>
           </div>
-
-          {error && (
-            <div className="text-red-500 text-sm">
-              {error}
-            </div>
-          )}
 
           <div>
             <button

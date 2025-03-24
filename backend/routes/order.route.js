@@ -1,6 +1,6 @@
 import express from "express";
 import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder } from "../controllers/order.controller.js";
-import sessionAuth from "../middleware/session.auth.js";
+import sessionAuth from "../middleware/auth.session.js";
 
 const router = express.Router();
 

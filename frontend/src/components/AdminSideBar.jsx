@@ -1,20 +1,18 @@
 import { Link } from "react-router-dom";
 import { useState } from "react"; 
-import { FaBox, FaClipboardList, FaBars, FaTachometerAlt, FaUsers, FaPaw, FaCalendarAlt, FaDollarSign, FaQuestionCircle, FaSignOutAlt } from "react-icons/fa"; // Import icons
+import { FaBox, FaClipboardList, FaBars, FaHeart, FaTachometerAlt, FaUsers, FaPaw, FaCalendarAlt, FaDollarSign, FaQuestionCircle } from "react-icons/fa"; // Import icons
 import { IoPawSharp } from "react-icons/io5";
+import LogoutButton from "./LogoutButton";
 
 const AdminSideBar = () => {
-  const [isOpen, setIsOpen] = useState(true); // State to manage navbar open/close
+  const [isOpen, setIsOpen] = useState(true); 
 
-  const toggleNavbar = () => setIsOpen(!isOpen); // Toggle function for the navbar
+  const toggleNavbar = () => setIsOpen(!isOpen); 
 
   return (
     <div className="flex h-screen">
-        {/* Sidebar (Vertical Navbar) */}
         <div className={`p-5 space-y-6 transition-all duration-400 ${isOpen ? "w-65" : "w-18"}`} style={{ backgroundColor: 'var(--dark-brown)' }}>
-            {/* Brand with Toggle Button */}
             <div className="flex justify-between items-center mb-6">
-                {/* Brand */}
                 {isOpen && (
                     <div className="text-white text-2xl font-bold">
                     <Link to="/" className="flex items-center">
@@ -22,7 +20,6 @@ const AdminSideBar = () => {
                     </Link>
                     </div>
                 )}
-                {/* Toggle Button */}
                 <div className="flex justify-end items-center">
                     <button onClick={toggleNavbar} className="text-white text-2xl font-bold text-center">
                     <FaBars />
@@ -34,7 +31,7 @@ const AdminSideBar = () => {
             <ul className="space-y-4">
                 <li>
                 <Link
-                    to="/dashboard"
+                    to="/admin/dashboard"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaTachometerAlt className="mr-3" /> : <FaTachometerAlt />} {isOpen && "Dashboard"}
@@ -42,7 +39,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/users"
+                    to="/admin/users"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaUsers className="mr-3" /> : <FaUsers />} {isOpen && "Users"}
@@ -50,7 +47,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/pets"
+                    to="/admin/pets"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "Pets"}
@@ -58,7 +55,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/appointments"
+                    to="/admin/appointments"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaCalendarAlt className="mr-3" /> : <FaCalendarAlt />} {isOpen && "Appointments"}
@@ -82,7 +79,15 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/finance"
+                    to="/admin/adoption"
+                    className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
+                >
+                    {isOpen ? <FaHeart className="mr-3" /> : <FaHeart />} {isOpen && "Adoptions"}
+                </Link>
+                </li>
+                <li>
+                <Link
+                    to="/admin/finance"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaDollarSign className="mr-3" /> : <FaDollarSign />} {isOpen && "Finance"}
@@ -98,12 +103,7 @@ const AdminSideBar = () => {
                 </Link>
                 </li>
                 <li>
-                <Link
-                    to="/logout"
-                    className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaSignOutAlt className="mr-3" /> : <FaSignOutAlt />} {isOpen && "Logout"}
-                </Link>
+                    <LogoutButton isOpen={isOpen} />
                 </li>
             </ul>
         </div>

@@ -66,13 +66,35 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await userService.loginUser(email, password);
+
+    // Always update session upon login
+    req.session.user = {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
+
     res.status(200).json({ message: "Login successful", user });
   } catch (error) {
     res.status(401).json({ message: error.message });
   }
+};
+
+export const logoutUser = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session:", err);
+      return res.status(500).json({ message: "Logout failed" });
+    }
+
+    res.clearCookie("connect.sid");
+    res.status(200).json({ message: "Logout successful" });
+  });
 };
