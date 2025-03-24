@@ -54,7 +54,7 @@ const ProductsShopPage = () => {
     if (error) return <div className="text-center text-red-500 py-8">{error}</div>;
 
     return (
-        <div className="container h-100 mx-auto px-6 py-8 mx-auto">
+        <div className="container mx-auto px-6 py-8">
             <div className="flex justify-between items-center mb-8 p-4 rounded-lg min-h-[250px]" 
                 style={{
                     backgroundImage: 'url("../assets/pet-shop-banner.png")',

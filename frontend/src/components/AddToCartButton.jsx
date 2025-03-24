@@ -19,7 +19,7 @@ const AddToCartButton = ({ productId, quantity }) => {  // Accept quantity as a 
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      toast.error('An error occurred. Please try again.');
+      toast.error('Login to add product to cart.');
     }
   };
 
