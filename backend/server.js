@@ -12,7 +12,7 @@ import userRoutes from './routes/user.route.js';
 //pet route
 //adopt route
 //appointment route
-mport appointmentRoutes from './routes/appointment.route.js';
+import appointmentRoutes from './routes/appointment.route.js';
 import timeSlotRoutes from './routes/timeslot.route.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 
