@@ -1,7 +1,6 @@
 import Order from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
 
-// Place an order
 export const placeOrder = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -33,11 +32,15 @@ export const placeOrder = async (req, res) => {
     }
     totalAmount = parseFloat(totalAmount.toFixed(2));
 
+    // Set paymentStatus based on the payment method selected
+    const paymentStatus = req.body.paymentMethod === 'Online Payment' ? 'Paid' : 'Pending';
+
     const newOrder = new Order({
       user: req.session.user._id,
       products: cart.items.map((item) => ({ product: item.product._id, quantity: item.quantity })),
       totalAmount,
       paymentMethod: req.body.paymentMethod,
+      paymentStatus, // Add paymentStatus to the order
       deliveryDetails: req.body.deliveryDetails,
     });
 

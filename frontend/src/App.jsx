@@ -16,6 +16,8 @@ import LandingPage from './pages/LandingPage';
 import LandingLayout from './layouts/LandingLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
+import AdminPayment from './components/AdminPayment';
+import MakePayment from './components/MakePayment';
 
 function App() {
   const [cartData] = useState([]);
@@ -59,12 +61,14 @@ function App() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
+        <Route path="payments" element={<AdminPayment />} />
       </Route>
 
       {/* Customer Routes */}
       <Route path="/customer" element={<CustomerDashboardLayout session={session}/>}>
         <Route path="dashboard" element={<CustomerDashboard />} />
         <Route path="products" element={<ProductsStorePage />} />
+        <Route path="payment" element={<MakePayment />} />
         <Route path="products/cart" element={<CartPage />} />
         <Route path="products/:id" element={<ProductDetailsPage />} />
         <Route path="products/checkout" element={<CheckoutPage cartItems={cartData} />} />

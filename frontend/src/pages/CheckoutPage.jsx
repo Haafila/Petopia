@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useOutletContext } from 'react-router-dom';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const { session } = useOutletContext();
   const { cart, cartTotal, clearCart } = useCart();
   const [formData, setFormData] = useState({
     name: '',
     address: '',
     city: '',
     postalCode: '',
-    phone: ''
+    phone: '',
   });
   const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -20,21 +22,13 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     let newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full Name is required';
-      toast.warn('Full Name is required');
-    }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required';
-      toast.warn('Address is required');
-    }
+    if (!formData.name.trim()) newErrors.name = 'Full Name is required';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
     if (!formData.postalCode.match(/^[0-9]{5}$/)) newErrors.postalCode = 'Enter a valid 5-digit postal code';
     if (!formData.phone.match(/^\d{10}$/)) newErrors.phone = 'Enter a valid 10-digit phone number';
-    if (!paymentMethod) {
-      newErrors.paymentMethod = 'Please select a payment method';
-      toast.warn('Please select a payment method');
-    }
+    if (!paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -46,8 +40,8 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    const sessionUser = { _id: '67d7dda581850a0c88ab9b77' };
+  
+    const sessionUser = session;
     const orderData = {
       user: sessionUser._id,
       products: cart.items.map(item => ({
@@ -55,24 +49,30 @@ const CheckoutPage = () => {
         quantity: item.quantity
       })),
       totalAmount: cartTotal,
-      paymentMethod,
-      paymentStatus: 'Pending',
+      paymentMethod: paymentMethod === 'Online Payment' ? 'Card' : 'Cash on Delivery', 
+      paymentStatus: paymentMethod === 'Online Payment' ? 'Paid' : 'Pending',
       status: 'Pending',
       deliveryDetails: { ...formData }
     };
-
+  
     try {
       setIsSubmitting(true);
-      await axios.post('/api/orders/place-order', orderData);
-      await clearCart();
-      toast.success('Order placed successfully!');
-      navigate('/customer/products');
+      const response = await axios.post('/api/orders/place-order', orderData);
+  
+      if (paymentMethod === 'Online Payment') {
+        navigate(`/customer/payment?serviceType=Order&amount=${cartTotal}&userName=${formData.name}`);
+      } else {
+        await clearCart();
+        toast.success('Order placed successfully!');
+        navigate('/customer/products');
+      }
     } catch (error) {
       toast.warn(`Failed to place order: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <div className="container h-100 mx-auto px-4 py-8 max-w-2xl bg-[var(--background-light)] p-6">
@@ -109,6 +109,9 @@ const CheckoutPage = () => {
             <div className="flex gap-4">
               <button type="button" onClick={() => setPaymentMethod('Cash on Delivery')}
                 className={`px-4 py-2 rounded ${paymentMethod === 'Cash on Delivery' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Cash on Delivery</button>
+              
+              <button type="button" onClick={() => setPaymentMethod('Online Payment')}
+                className={`px-4 py-2 rounded ${paymentMethod === 'Online Payment' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Online Payment</button>
             </div>
             {errors.paymentMethod && <p className="text-red-500 text-sm">{errors.paymentMethod}</p>}
 

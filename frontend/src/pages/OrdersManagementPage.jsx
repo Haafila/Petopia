@@ -159,7 +159,6 @@ const OrderManagementPage = () => {
     return (
         <div className="container h-100 mx-auto px-6 py-8 mx-auto">
             <h1 className="text-3xl font-extrabold mb-4">Order Management</h1>
-
             {isFormOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
                     <OrderStatusForm

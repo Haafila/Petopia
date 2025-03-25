@@ -12,19 +12,26 @@ const LogoutButton = ({ isOpen }) => {
         method: "POST",
         credentials: "include", 
       });
-
+  
       if (response.ok) {
-        toast.success("Successfully logged out!"); 
-        navigate("/login"); 
+        sessionStorage.clear(); 
+        localStorage.removeItem("session"); 
+  
+        // Show success message
+        toast.success("Successfully logged out!");
+  
+        navigate("/login");
+        window.location.reload(); 
       } else {
-        toast.error("Logout failed. Please try again."); 
+        toast.error("Logout failed. Please try again.");
         console.error("Logout failed");
       }
     } catch (err) {
-      toast.error("An error occurred during logout."); 
+      toast.error("An error occurred during logout.");
       console.error("Logout error:", err);
     }
   };
+  
 
   return (
     <button

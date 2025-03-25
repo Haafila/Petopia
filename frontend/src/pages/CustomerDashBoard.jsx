@@ -6,7 +6,7 @@ const CustomerDashboard = () => {
 
   return (
     <div>
-      <h1>Welcome, {session.email}</h1>
+      <h1>Welcome, {session.name}</h1>
     </div>
   );
 }

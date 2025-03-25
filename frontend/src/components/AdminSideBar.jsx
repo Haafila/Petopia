@@ -87,7 +87,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/admin/finance"
+                    to="/admin/payments"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaDollarSign className="mr-3" /> : <FaDollarSign />} {isOpen && "Finance"}

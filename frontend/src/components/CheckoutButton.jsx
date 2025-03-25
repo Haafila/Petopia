@@ -18,7 +18,7 @@ const CheckoutButton = () => {
     return (
         <button 
         onClick={handleCheckout} 
-        className="text-white italic font-bold transition delay-150 duration-300 ease-in-out w-full px-4 py-2 rounded bg-[var(--main-color)] hover:bg-pink-400 transition"
+        className="text-white italic font-bold transition w-full px-4 py-2 rounded bg-[var(--main-color)] hover:bg-pink-400"
         >
         Check out
         </button>

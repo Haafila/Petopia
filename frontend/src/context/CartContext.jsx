@@ -5,25 +5,17 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
-  const [cart, setCart] = useState({ items: [] }); // Default to empty cart
+  const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Fetch latest cart data
   const fetchCart = async () => {
     setLoading(true);
     try {
-      // Check authentication status first
-      const sessionResponse = await axios.get("/api/users/user");
-      setIsAuthenticated(true);
-
-      // If authenticated, fetch cart
       const response = await axios.get("/api/cart");
       setCart(response.data.data || { items: [] }); 
     } catch (error) {
       console.error("Error fetching cart:", error);
-      // If unauthorized, reset to default state
-      setIsAuthenticated(false);
       setCart({ items: [] }); 
     } finally {
       setLoading(false);
@@ -34,24 +26,18 @@ export const CartProvider = ({ children }) => {
     fetchCart(); 
   }, []);
 
+  // Add item to cart and refresh data
   const addToCart = async (productId, quantity) => {
-    if (!isAuthenticated) {
-      console.warn("Cannot add to cart. User not authenticated.");
-      return;
-    }
     try {
       await axios.post("/api/cart/add", { productId, quantity });
-      fetchCart(); // Refresh cart after adding
+      fetchCart(); 
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
   };
 
+  // Add this clearCart function
   const clearCart = async () => {
-    if (!isAuthenticated) {
-      console.warn("Cannot clear cart. User not authenticated.");
-      return;
-    }
     try {
       await axios.delete("/api/cart/clear"); 
       setCart({ items: [] }); 
@@ -60,24 +46,18 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Update quantity and refresh data
   const updateQuantity = async (itemId, quantity) => {
-    if (!isAuthenticated) {
-      console.warn("Cannot update quantity. User not authenticated.");
-      return;
-    }
     try {
       await axios.put(`/api/cart/update/${itemId}`, { quantity });
-      fetchCart(); // Refresh cart after update
+      fetchCart(); 
     } catch (error) {
       console.error("Error updating quantity:", error);
     }
   };
 
+  // Remove item and refresh data
   const removeFromCart = async (itemId) => {
-    if (!isAuthenticated) {
-      console.warn("Cannot remove from cart. User not authenticated.");
-      return;
-    }
     try {
       await axios.delete(`/api/cart/remove/${itemId}`);
       fetchCart();
@@ -96,24 +76,11 @@ export const CartProvider = ({ children }) => {
   const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   return (
-    <CartContext.Provider 
-      value={{ 
-        cart, 
-        loading, 
-        isAuthenticated, 
-        addToCart, 
-        updateQuantity, 
-        removeFromCart, 
-        cartTotal, 
-        cartCount, 
-        cartItems, 
-        setCartItems, 
-        clearCart 
-      }}
-    >
+    <CartContext.Provider value={{ cart, loading, addToCart, updateQuantity, removeFromCart, cartTotal, cartCount, cartItems, setCartItems, clearCart }}>
       {children}
     </CartContext.Provider>
   );
 };
 
+// Custom hook to use the CartContext
 export const useCart = () => useContext(CartContext);

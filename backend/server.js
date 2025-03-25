@@ -12,7 +12,7 @@ import userRoutes from './routes/user.route.js';
 //pet route
 //adopt route
 //appointment route
-//finance route
+import paymentRoutes from './routes/paymentRoutes.js';
 
 dotenv.config();
 
@@ -44,7 +44,7 @@ app.use('/api/cart', cartRoutes);
 //app.use('/api/pet', authRoutes);
 //app.use('/api/adopt', authRoutes);
 //app.use('/api/appointment', authRoutes);
-//app.use('/api/finance', authRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.listen(PORT, () => {
     connectDB();
