@@ -89,6 +89,7 @@ function App() {
         <Route path="bookMedical" element={<Medical />} />
         <Route path="bookTraining" element={<Training />} />
         <Route path="bookBoarding" element={<Boarding />} />
+        <Route path="UserAppointments" element ={<UserAppointments />} />
       </Route>
 
        {/* staff Routes */}
