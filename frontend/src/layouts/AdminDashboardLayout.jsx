@@ -4,22 +4,10 @@ import DashboardHeader from '../components/DashboardHeader';
 import AdminSideBar from '../components/AdminSideBar';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
-import { useRef } from 'react';
 
 const AdminDashboardLayout = ({ session }) => {
-  const toastShownRef = useRef(false);
-
-  useEffect(() => {
-    if (!session || session.role !== 'admin') {
-      if (!toastShownRef.current) {
-        toast.warn('You are not authorized to access this page. Please login as an admin.');
-        toastShownRef.current = true;
-      }
-    }
-  }, [session]);
-
-  if (!session || session.role !== 'admin') {
+  if (!session) {
+    toast.warn('You are not authorized to access this page. Please login first.');
     return <Navigate to="/login" />;
   }
   return (

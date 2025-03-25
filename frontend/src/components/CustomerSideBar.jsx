@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaClipboardList, FaBars, FaPaw, FaCalendarAlt, FaQuestionCircle, FaUser, FaShoppingCart, FaHeart, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaClipboardList, FaBars, FaPaw, FaCalendarAlt, FaTachometerAlt, FaQuestionCircle, FaUser, FaShoppingCart, FaHeart, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { IoPawSharp } from "react-icons/io5";
 import LogoutButton from "./LogoutButton";
 
@@ -30,6 +30,14 @@ const CustomerSideBar = () => {
         </div>
 
         <ul className="space-y-4">
+          <li>
+            <Link
+                to="/customer/dashboard"
+                className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
+            >
+                {isOpen ? <FaTachometerAlt className="mr-3" /> : <FaTachometerAlt />} {isOpen && "Dashboard"}
+            </Link>
+            </li>
           <li>
             <Link to="/account" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaUser className="mr-3" /> : <FaUser />} {isOpen && "My Account"}

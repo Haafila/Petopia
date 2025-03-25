@@ -20,13 +20,13 @@ const CartPage = () => {
 
   // Ensure valid quantity (min 1)
   const handleQuantityChange = (itemId, value) => {
-    const newValue = Math.max(1, Number(value)); // Prevents negative values
+    const newValue = Math.max(1, Number(value)); 
     setQuantities(prev => ({ ...prev, [itemId]: newValue }));
   };
 
   // Handle update and refresh
   const handleUpdate = async (itemId) => {
-    await updateQuantity(itemId, quantities[itemId]); // Calls API and auto-refreshes
+    await updateQuantity(itemId, quantities[itemId]); 
   };
 
   if (loading) return <p>Loading cart...</p>;
