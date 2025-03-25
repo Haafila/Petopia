@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 
 import AddToCartButton from './AddToCartButton';
 
-const ProductCard = ({ product }) => {  // Change "Product" to lowercase "product"
+const ProductCard = ({ product }) => {  
   return (
     <div className="border rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
       <img 
-        src={product.imageUrl || '../assets/no-image.jpg'}  // Update references to product
+        src={product.imageUrl || '../assets/no-image.jpg'}  
         alt={product.name}
         className="w-full h-48 object-cover mb-4 rounded"
       />

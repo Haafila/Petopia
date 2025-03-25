@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const AddToCartButton = ({ productId, quantity }) => {  // Accept quantity as a prop
+const AddToCartButton = ({ productId, quantity }) => { 
   const handleAddToCart = async () => {
     try {
       const response = await axios.post('/api/cart/add', {

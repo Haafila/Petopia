@@ -14,9 +14,7 @@ router.put("/:orderId/cancel", cancelOrder);
 router.get("/", getAllOrders);
 router.put("/:id", updateOrder);
 router.delete("/:id", deleteOrder);
-// Update order status
 router.patch("/:orderId/status", updateOrderStatus);
-// Update payment status
 router.patch("/:orderId/payment-status", updatePaymentStatus);
 
 

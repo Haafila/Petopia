@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Login from './pages/Login';
 import AdminDashboardLayout from './layouts/AdminDashboardLayout';
 import CustomerDashboardLayout from './layouts/CustomerDashboardLayout';
@@ -13,9 +14,35 @@ import UserOrdersPage from './pages/UserOrdersPage';
 import RegisterPage from './pages/Register';
 import LandingPage from './pages/LandingPage';
 import LandingLayout from './layouts/LandingLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import CustomerDashboard from './pages/CustomerDashboard';
 
 function App() {
   const [cartData] = useState([]);
+  const [session, setSession] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const response = await fetch('/api/users/session', {
+          credentials: 'include', 
+        });
+        const data = await response.json();
+        setSession(data);
+      } catch (error) {
+        console.error('Error fetching session:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSession();
+  }, []);
+
+  if (isLoading) {
+    return  <div className="text-center py-8"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+            <p className="mt-2 text-gray-600">Loading orders...</p></div>; 
+  }
 
   return (
     <Routes>
@@ -28,15 +55,15 @@ function App() {
       </Route>
 
       {/* Admin Routes */}
-      <Route path="/admin" element={<AdminDashboardLayout />}>
-        <Route path="dashboard" element={<h1>Admin Dashboard</h1>} />
+      <Route path="/admin" element={<AdminDashboardLayout session={session}/>}>
+        <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
       </Route>
 
       {/* Customer Routes */}
-      <Route path="/customer" element={<CustomerDashboardLayout />}>
-        <Route path="dashboard" element={<h1>Customer Dashboard</h1>} />
+      <Route path="/customer" element={<CustomerDashboardLayout session={session}/>}>
+        <Route path="dashboard" element={<CustomerDashboard />} />
         <Route path="products" element={<ProductsStorePage />} />
         <Route path="products/cart" element={<CartPage />} />
         <Route path="products/:id" element={<ProductDetailsPage />} />

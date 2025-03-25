@@ -14,9 +14,8 @@ const ProductDetailsPage = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(`/api/products/${id}`);
-        console.log('API Response:', response.data); // Log the response for debugging
         if (response.data && response.data.data) {
-          setProduct(response.data.data); // Access the product object directly
+          setProduct(response.data.data);
         } else {
           console.error('No product found in response data');
         }

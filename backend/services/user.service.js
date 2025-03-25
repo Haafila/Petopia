@@ -31,7 +31,6 @@ export const loginUser = async (email, password) => {
     throw new Error("User not found");
   }
 
-  // Direct password comparison (not secure for production)
   if (password !== user.password) {
     throw new Error("Invalid password");
   }

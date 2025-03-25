@@ -8,11 +8,11 @@ export default function DashboardHeader() {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch('/api/auth/user', {
-          credentials: 'include', // Required for cookies
+        const response = await fetch('/api/users/session', {
+          credentials: 'include', 
         });
         const data = await response.json();
-        console.log('Session data:', data); // Debug log
+        console.log('Session data:', data); 
         setSession(data);
       } catch (error) {
         console.error('Error fetching session:', error);

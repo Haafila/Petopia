@@ -8,7 +8,6 @@ const CartPage = () => {
   const { cart, loading, updateQuantity, removeFromCart, cartTotal, cartCount } = useCart();
   const [quantities, setQuantities] = useState({});
 
-  // Initialize quantities state when cart loads
   useEffect(() => {
     if (cart?.items) {
       const initialQuantities = {};

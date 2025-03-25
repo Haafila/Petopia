@@ -1,4 +1,5 @@
 import * as userService from "../services/user.service.js";
+import mongoose from "mongoose";
 
 export const createUser = async (req, res) => {
   try {
@@ -36,7 +37,12 @@ export const updateUser = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    const user = await userService.getUserById(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+    
+    const user = await userService.getUserById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -73,17 +79,23 @@ export const loginUser = async (req, res) => {
   try {
     const user = await userService.loginUser(email, password);
 
-    // Always update session upon login
     req.session.user = {
       _id: user._id,
       email: user.email,
       name: user.name,
       role: user.role,
     };
-
     res.status(200).json({ message: "Login successful", user });
   } catch (error) {
     res.status(401).json({ message: error.message });
+  }
+};
+
+export const getSessionUser = (req, res) => {
+  if (req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
   }
 };
 
