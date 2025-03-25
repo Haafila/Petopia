@@ -45,7 +45,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--light-purple)]">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Register</h2>
 
@@ -64,7 +64,7 @@ const Register = () => {
           {error && <p className="text-red-500 text-sm">{error}</p>}
           {success && <p className="text-green-500 text-sm">{success}</p>}
 
-          <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          <button type="submit" className="w-full bg-[var(--main-color)] text-white p-2 rounded hover:bg-rose-400">
             Register
           </button>
           <div className="text-center mt-4">
@@ -72,7 +72,7 @@ const Register = () => {
                 Have an account?{" "}
                 <a
                 href="/login"
-                className="text-blue-600 hover:text-blue-800 font-medium transition duration-300"
+                className="text-pink-600 hover:text-pink-800 font-medium transition duration-300"
                 >
                 Login
                 </a>
