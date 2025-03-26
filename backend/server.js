@@ -12,6 +12,8 @@ import userRoutes from './routes/user.route.js';
 //pet route
 //adopt route
 //appointment route
+import appointmentRoutes from './routes/appointment.route.js';
+import timeSlotRoutes from './routes/timeslot.route.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import financeRoutes from './routes/FinancialRecord.routes.js';
 
@@ -47,6 +49,8 @@ app.use('/api/cart', cartRoutes);
 //app.use('/api/appointment', authRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/finance', financeRoutes);
+app.use("/appointments", appointmentRoutes);
+app.use('/timeslots', timeSlotRoutes);
 
 app.listen(PORT, () => {
     connectDB();

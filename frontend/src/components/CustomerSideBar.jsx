@@ -61,12 +61,12 @@ const CustomerSideBar = () => {
             {isDropdownOpen && (
               <ul className="ml-6 mt-2 space-y-2 transition-all duration-300">
                 <li>
-                  <Link to="/appointment/new" className="block text-white hover:bg-rose-400 p-2 rounded">
+                  <Link to="/customer/ServiceType" className="block text-white hover:bg-rose-400 p-2 rounded">
                     New Appointment
                   </Link>
                 </li>
                 <li>
-                  <Link to="/appointment/history" className="block text-white hover:bg-rose-400 p-2 rounded">
+                  <Link to="/customer/UserAppointments" className="block text-white hover:bg-rose-400 p-2 rounded">
                     Appointment History
                   </Link>
                 </li>

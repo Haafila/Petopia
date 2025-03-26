@@ -55,7 +55,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/admin/appointments"
+                    to="/admin/AppointmentList"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaCalendarAlt className="mr-3" /> : <FaCalendarAlt />} {isOpen && "Appointments"}

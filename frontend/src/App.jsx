@@ -19,6 +19,16 @@ import CustomerDashboard from './pages/CustomerDashboard';
 import AdminPayment from './components/AdminPayment';
 import MakePayment from './components/MakePayment';
 
+
+import ServiceType from "./components/ServiceTypes"
+import Grooming from "./components/GroomingForm"
+import Medical from "./components/MedicalForm"
+import Training from "./components/TrainingForm"
+import Boarding from "./components/BoardingForm"
+import AppointmentList from './components/AppointmentList';
+import UserAppointments from './components/UserAppointments';
+import StaffAppointmentList from './components/StaffAppointment';
+
 function App() {
   const [cartData] = useState([]);
   const [session, setSession] = useState(null);
@@ -62,6 +72,7 @@ function App() {
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
         <Route path="payments" element={<AdminPayment />} />
+        <Route path="AppointmentList" element ={<AppointmentList />} />
       </Route>
 
       {/* Customer Routes */}
@@ -73,7 +84,22 @@ function App() {
         <Route path="products/:id" element={<ProductDetailsPage />} />
         <Route path="products/checkout" element={<CheckoutPage cartItems={cartData} />} />
         <Route path="orders" element={<UserOrdersPage />} />
+        <Route path="ServiceType" element={<ServiceType />} />
+        <Route path="bookGrooming" element={<Grooming />} />
+        <Route path="bookMedical" element={<Medical />} />
+        <Route path="bookTraining" element={<Training />} />
+        <Route path="bookBoarding" element={<Boarding />} />
+        <Route path="UserAppointments" element ={<UserAppointments />} />
       </Route>
+
+       {/* staff Routes */}
+      <Route path="/appointments/grooming" element={<StaffAppointmentList serviceType="Grooming" />} />
+      <Route path="/appointments/training" element={<StaffAppointmentList serviceType="Training" />} />
+      <Route path="/appointments/medical" element={<StaffAppointmentList serviceType="Medical" />} />
+      <Route path="/appointments/boarding" element={<StaffAppointmentList serviceType="Boarding" />} />
+
+
+      
     </Routes>
   );
 }
