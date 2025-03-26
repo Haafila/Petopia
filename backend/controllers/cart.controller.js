@@ -37,8 +37,7 @@ export const getCart = async (req, res) => {
       "items.product",
       "name price images"
     );
-
-    // If the cart doesn't exist, create a new one
+    
     if (!cart) {
       cart = new Cart({
         user: req.session.user._id,

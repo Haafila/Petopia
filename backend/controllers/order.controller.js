@@ -32,15 +32,15 @@ export const placeOrder = async (req, res) => {
     }
     totalAmount = parseFloat(totalAmount.toFixed(2));
 
-    // Set paymentStatus based on the payment method selected
-    const paymentStatus = req.body.paymentMethod === 'Online Payment' ? 'Paid' : 'Pending';
+    // Set paymentStatus
+    const paymentStatus = req.body.paymentMethod === 'Card' ? 'Paid' : 'Pending';
 
     const newOrder = new Order({
       user: req.session.user._id,
       products: cart.items.map((item) => ({ product: item.product._id, quantity: item.quantity })),
       totalAmount,
       paymentMethod: req.body.paymentMethod,
-      paymentStatus, // Add paymentStatus to the order
+      paymentStatus, 
       deliveryDetails: req.body.deliveryDetails,
     });
 

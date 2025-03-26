@@ -40,17 +40,17 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-  
+    
     const sessionUser = session;
     const orderData = {
       user: sessionUser._id,
-      products: cart.items.map(item => ({
+      products: (cart?.items || []).map(item => ({
         product: item.product._id,
         quantity: item.quantity
       })),
       totalAmount: cartTotal,
-      paymentMethod: paymentMethod === 'Online Payment' ? 'Card' : 'Cash on Delivery', 
-      paymentStatus: paymentMethod === 'Online Payment' ? 'Paid' : 'Pending',
+      paymentMethod: paymentMethod === 'Card' ? 'Card' : 'Cash on Delivery', 
+      paymentStatus: paymentMethod === 'Card' ? 'Paid' : 'Pending',
       status: 'Pending',
       deliveryDetails: { ...formData }
     };
@@ -59,8 +59,16 @@ const CheckoutPage = () => {
       setIsSubmitting(true);
       const response = await axios.post('/api/orders/place-order', orderData);
   
-      if (paymentMethod === 'Online Payment') {
-        navigate(`/customer/payment?serviceType=Order&amount=${cartTotal}&userName=${formData.name}`);
+      if (paymentMethod === 'Card') {
+        // Pass the entire order data to the payment page
+        navigate(`/customer/payment?serviceType=Order&amount=${cartTotal}&userName=${formData.name}`, { 
+          state: { 
+            serviceType: 'Order', 
+            amount: cartTotal, 
+            userName: formData.name,
+            orderData: response.data.data // Pass the created order data
+          }
+        });
       } else {
         await clearCart();
         toast.success('Order placed successfully!');
@@ -73,11 +81,10 @@ const CheckoutPage = () => {
     }
   };
   
-
   return (
     <div className="container h-100 mx-auto px-4 py-8 max-w-2xl bg-[var(--background-light)] p-6">
       <h2 className="text-2xl font-extrabold mb-4 text-[var(--dark-brown)]">Checkout</h2>
-      {cart?.items?.length === 0 ? (
+      {!cart || cart.items?.length === 0 ? (
         <p className="text-red-500">Your cart is empty. <a href="/customer/products" className="text-[var(--main-color)] underline">Go to shop</a></p>
       ) : (
         <>
@@ -110,8 +117,8 @@ const CheckoutPage = () => {
               <button type="button" onClick={() => setPaymentMethod('Cash on Delivery')}
                 className={`px-4 py-2 rounded ${paymentMethod === 'Cash on Delivery' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Cash on Delivery</button>
               
-              <button type="button" onClick={() => setPaymentMethod('Online Payment')}
-                className={`px-4 py-2 rounded ${paymentMethod === 'Online Payment' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Online Payment</button>
+              <button type="button" onClick={() => setPaymentMethod('Card')}
+                className={`px-4 py-2 rounded ${paymentMethod === 'Card' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Online Payment</button>
             </div>
             {errors.paymentMethod && <p className="text-red-500 text-sm">{errors.paymentMethod}</p>}
 
