@@ -83,7 +83,7 @@ const ProductForm = ({ product, onSubmit, onClose }) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Description</label>
-                        <textarea name="description" value={formData.description} onChange={handleChange} maxLength={250} className="w-full px-4 py-2 border rounded" />
+                        <textarea name="description" value={formData.description} onChange={handleChange} maxLength={1000} className="w-full px-4 py-2 border rounded" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Image URL</label>

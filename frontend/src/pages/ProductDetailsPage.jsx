@@ -30,7 +30,7 @@ const ProductDetailsPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-end mb-4 py-8">
+      <div className="flex justify-end mb-4 py-4">
         <CartButton />
       </div>
       <div className="grid md:grid-cols-2 gap-8">
@@ -66,7 +66,7 @@ const ProductDetailsPage = () => {
 
           <div className="flex gap-4">
             <AddToCartButton productId={product._id} quantity={quantity} />
-            <button className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600">
+            <button className="bg-purple-400 text-white px-6 py-3 rounded hover:bg-purple-600"  style={{ display: 'none' }}>
               Buy Now
             </button>
           </div>
