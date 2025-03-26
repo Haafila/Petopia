@@ -15,6 +15,10 @@ const ProductManagementPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 6; 
 
+    // Category filter state
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const categories = ['', 'Accessories', 'Toys', 'Housing', 'Food', 'Health', 'Others'];
+
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -67,28 +71,58 @@ const ProductManagementPage = () => {
         }
     };
 
+    // Filtering Logic
+    const filteredProducts = selectedCategory 
+        ? products.filter(product => product.category === selectedCategory)
+        : products;
+
     // Pagination Logic
     const offset = currentPage * itemsPerPage;
-    const currentProducts = products.slice(offset, offset + itemsPerPage);
-    const pageCount = Math.ceil(products.length / itemsPerPage);
+    const currentProducts = filteredProducts.slice(offset, offset + itemsPerPage);
+    const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
 
     const handlePageClick = (event) => {
         setCurrentPage(event.selected);
     };
 
+    // Reset current page when category changes
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [selectedCategory]);
+
     return (
         <div className="container h-100 mx-auto px-6 py-8 mx-auto">
             <h1 className="text-3xl font-extrabold mb-4">Product Management</h1>
 
-            <button
-                onClick={() => {
-                    setEditingProduct(null);
-                    setIsFormOpen(true);
-                }}
-                className="bg-rose-300 border text-white px-4 py-2 rounded mb-4 hover:bg-rose-400"
-            >
-                Add New Product
-            </button>
+            <div className="flex justify-between items-center mb-4">
+                <button
+                    onClick={() => {
+                        setEditingProduct(null);
+                        setIsFormOpen(true);
+                    }}
+                    className="bg-rose-300 border text-white px-4 py-2 rounded hover:bg-rose-400"
+                >
+                    Add New Product
+                </button>
+
+                <div className="flex items-center">
+                    <label htmlFor="category-filter" className="mr-2 text-gray-700">
+                        Filter by Category:
+                    </label>
+                    <select
+                        id="category-filter"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="border border-pink-300 rounded px-2 py-1"
+                    >
+                        {categories.map((category) => (
+                            <option key={category} value={category}>
+                                {category || 'All Categories'}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
             {isFormOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-opacity-30 z-50">
@@ -144,7 +178,9 @@ const ProductManagementPage = () => {
                         ) : (
                             <tr>
                                 <td colSpan="8" className="text-center px-4 py-2 border">
-                                    No products available.
+                                    {selectedCategory 
+                                        ? `No products in ${selectedCategory} category.` 
+                                        : 'No products available.'}
                                 </td>
                             </tr>
                         )}
@@ -153,7 +189,7 @@ const ProductManagementPage = () => {
             </div>
 
             {/* Pagination Component */}
-            {products.length > itemsPerPage && (
+            {filteredProducts.length > itemsPerPage && (
                 <div className="flex justify-center mt-4">
                     <ReactPaginate
                         previousLabel={"← Previous"}

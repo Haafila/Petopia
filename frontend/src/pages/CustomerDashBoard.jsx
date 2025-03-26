@@ -161,7 +161,7 @@ const CustomerDashboard = () => {
           </div>
 
           {/* Reminders Card */}
-          <div className="bg-gray-200 rounded-xl p-6">
+          <div className="bg-gray-200 rounded-xl p-6 mb-10">
             <h3 className="text-xl font-bold mb-4 text-[#3d1e24] flex items-center">
               <FileText className="mr-2 text-teal-600" />
               Reminders

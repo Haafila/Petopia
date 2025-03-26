@@ -5,9 +5,11 @@ import ReactPaginate from 'react-paginate';
 import OrderStatusForm from '../components/OrderStatusForm';
 import OrderDetailsView from '../components/OrderDetailsView';
 import { useConfirmDialog } from '../components/ConfirmDialog';
+import OrderFilter from '../components/OrderFilter';
 
 const OrderManagementPage = () => {
     const [orders, setOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]);
     const [editingOrder, setEditingOrder] = useState(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -22,6 +24,10 @@ const OrderManagementPage = () => {
     useEffect(() => {
         fetchOrders();
     }, []);
+
+    useEffect(() => {
+        setFilteredOrders(orders);
+    }, [orders]);
 
     const fetchOrders = async () => {
         setLoading(true);
@@ -63,7 +69,6 @@ const OrderManagementPage = () => {
 
     const handleFormSubmit = async (updatedStatus) => {
         try {
-            // For debugging
             console.log("Updating:", updateType, "for order:", editingOrder._id, "to status:", updatedStatus);
             
             if (updateType === 'order') {
@@ -97,11 +102,11 @@ const OrderManagementPage = () => {
 
     // Pagination Logic
     const offset = currentPage * itemsPerPage;
-    const currentOrders = orders && orders.length > 0 
-        ? orders.slice(offset, offset + itemsPerPage) 
+    const currentOrders = filteredOrders.length > 0 
+        ? filteredOrders.slice(offset, offset + itemsPerPage) 
         : [];
-    const pageCount = orders && orders.length > 0 
-        ? Math.ceil(orders.length / itemsPerPage) 
+    const pageCount = filteredOrders.length > 0 
+        ? Math.ceil(filteredOrders.length / itemsPerPage) 
         : 0;
 
     const handlePageClick = (event) => {
@@ -156,9 +161,52 @@ const OrderManagementPage = () => {
         );
     };
 
+    const handleFilterApply = (filters) => {
+        if (!filters) {
+            // Reset to all orders
+            setFilteredOrders(orders);
+            setCurrentPage(0);
+            return;
+        }
+
+        const { orderStatus, paymentStatus, dateFrom, dateTo } = filters;
+
+        const filtered = orders.filter(order => {
+            // Order Status Filter
+            if (orderStatus && order.status?.toLowerCase() !== orderStatus.toLowerCase()) {
+                return false;
+            }
+
+            // Payment Status Filter
+            if (paymentStatus && order.paymentStatus?.toLowerCase() !== paymentStatus.toLowerCase()) {
+                return false;
+            }
+
+            // Date Range Filter
+            const orderDate = new Date(order.createdAt);
+            if (dateFrom) {
+                const fromDate = new Date(dateFrom);
+                if (orderDate < fromDate) return false;
+            }
+
+            if (dateTo) {
+                const toDate = new Date(dateTo);
+                toDate.setHours(23, 59, 59, 999); // End of the day
+                if (orderDate > toDate) return false;
+            }
+
+            return true;
+        });
+
+        setFilteredOrders(filtered);
+        setCurrentPage(0);
+    };
+
     return (
         <div className="container h-100 mx-auto px-6 py-8 mx-auto">
             <h1 className="text-3xl font-extrabold mb-4">Order Management</h1>
+            {/* OrderFilter Component */}
+            <OrderFilter onFilterApply={handleFilterApply} />
             {isFormOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
                     <OrderStatusForm
@@ -277,7 +325,7 @@ const OrderManagementPage = () => {
             </div>
 
             {/* Pagination Component */}
-            {orders && orders.length > itemsPerPage && (
+            {filteredOrders.length > itemsPerPage && (
                 <div className="flex justify-center mt-4">
                     <ReactPaginate
                         previousLabel={"← Previous"}

@@ -6,7 +6,7 @@ import {
   getFinancialRecord, 
   getFinancialRecords, 
   updateFinancialRecord 
-} from "../controllers/financialRecord.controller.js";
+} from "../controllers/FinancialRecordController.js";
 
 const router = express.Router();
 
