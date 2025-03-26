@@ -51,7 +51,7 @@ const CustomerDashboard = () => {
   const OrderCard = () => {
     if (loading) return (
       <div className="bg-rose-50 rounded-xl p-6 text-center">
-        <p className="text-rose-600">Loading orders...</p>
+        <p className="text-rose-600">Loading...</p>
       </div>
     );
 

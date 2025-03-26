@@ -239,7 +239,7 @@ const OrderManagementPage = () => {
                 {loading ? (
                     <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-                        <p className="mt-2 text-gray-600">Loading orders...</p>
+                        <p className="mt-2 text-gray-600">Loading Orders...</p>
                     </div>
                 ) : (
                     <table className="min-w-full divide-y divide-pink-200 border border-pink-300 rounded-full">
