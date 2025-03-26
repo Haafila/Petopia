@@ -5,7 +5,7 @@ import axios from "axios";
 function Grooming() {
    const navigate = useNavigate();
 
-   const [userId, setUserId] = useState("67d7dda581850a0c88ab9b77");
+   //const [userId, setUserId] = useState("67d7dda581850a0c88ab9b77");
    const [pets, setPets] = useState([]);
    const [petId, setPetId] = useState("");
    const [serviceType] = useState("Grooming");
@@ -22,6 +22,28 @@ function Grooming() {
 
 
 
+   const [session, setSession] = useState({ _id: '', email: '' });
+   
+     useEffect(() => {
+       const fetchSession = async () => {
+         try {
+           const response = await fetch('/api/users/session', {
+             credentials: 'include', 
+           });
+           const data = await response.json();
+           console.log('Session data:', data); 
+           setSession(data);
+         } catch (error) {
+           console.error('Error fetching session:', error);
+         }
+       };
+       fetchSession();
+     }, []);
+
+   const userId = session._id;
+
+
+
    // Fetch user's pets
    useEffect(() => {
       axios.get(`http://localhost:5000/appointments/pets/${userId}`)
@@ -29,9 +51,7 @@ function Grooming() {
          .catch(error => console.error("Error fetching pets:", error));
    }, [userId]);
 
-
-
-   // Fetch booked slots when date and grooming type change
+   // Fetch booked slots when date change
    useEffect(() => {
       if (date) {
          axios.get(`http://localhost:5000/timeslots/bookedSlots?date=${date}&serviceType=${serviceType}`)
