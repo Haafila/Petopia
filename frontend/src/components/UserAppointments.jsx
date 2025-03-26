@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AppointmentDetails from "./AppointmentDetails";
+import { useOutletContext } from "react-router-dom";
 
 function UserAppointments() {
   const [appointments, setAppointments] = useState({ upcoming: [], past: [] });
   const [loading, setLoading] = useState(true);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-
-
+  const { session } = useOutletContext();
 
   useEffect(() => {
-    const userId = "67d7dda581850a0c88ab9b77";
+    const userId = session._id;
 
     const fetchAppointments = async () => {
       try {
