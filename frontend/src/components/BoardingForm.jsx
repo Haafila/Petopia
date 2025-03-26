@@ -4,12 +4,33 @@ import axios from "axios";
 
 function Boarding() {
    const navigate = useNavigate();
-   const [userId] = useState("67d7dda581850a0c88ab9b77"); 
+   //const [userId] = useState("67d7dda581850a0c88ab9b77"); 
    const [pets, setPets] = useState([]);
    const [petId, setPetId] = useState("");
    const [serviceType] = useState("Boarding");
    const [startDate, setStartDate] = useState("");
    const [endDate, setEndDate] = useState("");
+
+   const [session, setSession] = useState({ _id: '', email: '' });
+      
+        useEffect(() => {
+          const fetchSession = async () => {
+            try {
+              const response = await fetch('/api/users/session', {
+                credentials: 'include', 
+              });
+              const data = await response.json();
+              console.log('Session data:', data); 
+              setSession(data);
+            } catch (error) {
+              console.error('Error fetching session:', error);
+            }
+          };
+          fetchSession();
+        }, []);
+   
+      const userId = session._id;
+
 
    useEffect(() => {
       axios.get(`http://localhost:5000/appointments/pets/${userId}`)
