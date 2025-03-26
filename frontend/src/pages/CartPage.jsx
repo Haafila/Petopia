@@ -29,7 +29,10 @@ const CartPage = () => {
     await updateQuantity(itemId, quantities[itemId]); 
   };
 
-  if (loading) return <p>Loading cart...</p>;
+  if (loading) return <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+                        <p className="mt-2 text-gray-600">Loading Items...</p>
+                      </div>;
 
   return (
     <div className="container h-100 mx-auto px-6 py-8 mx-auto">
