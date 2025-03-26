@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Login from './pages/Login';
 import AdminDashboardLayout from './layouts/AdminDashboardLayout';
 import CustomerDashboardLayout from './layouts/CustomerDashboardLayout';
+
 import ProductsStorePage from './pages/ProductsShopPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import CartPage from './pages/CartPage';
@@ -11,14 +12,16 @@ import CheckoutPage from './pages/CheckoutPage';
 import ProductManagementPage from './pages/ProductsManagementPage';
 import OrderManagementPage from './pages/OrdersManagementPage';
 import UserOrdersPage from './pages/UserOrdersPage';
+
 import RegisterPage from './pages/Register';
 import LandingPage from './pages/LandingPage';
 import LandingLayout from './layouts/LandingLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
+
 import AdminPayment from './components/AdminPayment';
 import MakePayment from './components/MakePayment';
-
+import FinanceManagementPage from './pages/FinanceManagementPage';
 
 import ServiceType from "./components/ServiceTypes"
 import Grooming from "./components/GroomingForm"
@@ -71,6 +74,7 @@ function App() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
+        <Route path="finance" element={<FinanceManagementPage />} />
         <Route path="payments" element={<AdminPayment />} />
         <Route path="AppointmentList" element ={<AppointmentList />} />
       </Route>

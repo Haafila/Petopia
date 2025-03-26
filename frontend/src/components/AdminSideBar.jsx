@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { useState } from "react"; 
-import { FaBox, FaClipboardList, FaBars, FaHeart, FaTachometerAlt, FaUsers, FaPaw, FaCalendarAlt, FaDollarSign, FaQuestionCircle } from "react-icons/fa"; // Import icons
+import { FaBox, FaClipboardList, FaBars, FaHeart, FaTachometerAlt, FaUsers, FaPaw, FaCalendarAlt, FaDollarSign, FaQuestionCircle, FaChevronDown, FaChevronRight } from "react-icons/fa"; // Added FaChevronDown and FaChevronRight
 import { IoPawSharp } from "react-icons/io5";
 import LogoutButton from "./LogoutButton";
 
 const AdminSideBar = () => {
   const [isOpen, setIsOpen] = useState(true); 
+  const [isFinanceDropdownOpen, setIsFinanceDropdownOpen] = useState(false);
 
   const toggleNavbar = () => setIsOpen(!isOpen); 
+  const toggleFinanceDropdown = () => setIsFinanceDropdownOpen(!isFinanceDropdownOpen);
 
   return (
     <div className="flex h-screen">
@@ -85,13 +87,42 @@ const AdminSideBar = () => {
                     {isOpen ? <FaHeart className="mr-3" /> : <FaHeart />} {isOpen && "Adoptions"}
                 </Link>
                 </li>
+                {/* Finance section with dropdown */}
                 <li>
-                <Link
-                    to="/admin/payments"
-                    className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
-                >
-                    {isOpen ? <FaDollarSign className="mr-3" /> : <FaDollarSign />} {isOpen && "Finance"}
-                </Link>
+                    <div 
+                        onClick={isOpen ? toggleFinanceDropdown : undefined} 
+                        className="flex items-center text-white hover:bg-rose-400 p-2 rounded cursor-pointer"
+                    >
+                        {isOpen ? (
+                            <>
+                                <FaDollarSign className="mr-3" />
+                                <span className="flex-grow">Finance</span>
+                                {isFinanceDropdownOpen ? <FaChevronDown /> : <FaChevronRight />}
+                            </>
+                        ) : (
+                            <FaDollarSign />
+                        )}
+                    </div>
+                    {isOpen && isFinanceDropdownOpen && (
+                        <ul className="pl-6 space-y-2 mt-2">
+                            <li>
+                                <Link
+                                    to="/admin/payments"
+                                    className="flex items-center text-white hover:bg-rose-400 p-2 rounded block text-sm"
+                                >
+                                    Online Payments
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/admin/finance"
+                                    className="flex items-center text-white hover:bg-rose-400 p-2 rounded block text-sm"
+                                >
+                                    Financial Records
+                                </Link>
+                            </li>
+                        </ul>
+                    )}
                 </li>
                 <hr className="border-t border-gray-600 my-4" />
                 <li>
