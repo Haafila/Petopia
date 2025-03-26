@@ -4,7 +4,7 @@ import axios from "axios";
 
 function Training() {
    const navigate = useNavigate();
-   const [userId, setUserId] = useState("67d7dda581850a0c88ab9b77"); // Replace with actual logged-in user ID
+   //const [userId, setUserId] = useState("67d7dda581850a0c88ab9b77");
    const [pets, setPets] = useState([]);
    const [petId, setPetId] = useState("");
    const [serviceType] = useState("Training");
@@ -19,6 +19,27 @@ function Training() {
       "11:00 AM-11:30 AM", "11:30 AM-12:00 PM", "02:00 PM-02:30 PM", "02:30 PM-03:00 PM",
       "03:00 PM-03:30 PM", "03:30 PM-04:00 PM"
    ];
+
+
+   const [session, setSession] = useState({ _id: '', email: '' });
+      
+        useEffect(() => {
+          const fetchSession = async () => {
+            try {
+              const response = await fetch('/api/users/session', {
+                credentials: 'include', 
+              });
+              const data = await response.json();
+              console.log('Session data:', data); 
+              setSession(data);
+            } catch (error) {
+              console.error('Error fetching session:', error);
+            }
+          };
+          fetchSession();
+        }, []);
+   
+      const userId = session._id;
 
 
    useEffect(() => {
