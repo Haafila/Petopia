@@ -8,6 +8,7 @@ const ProductsShopPage = () => {
     const [products, setProducts] = useState([]);
     const [categories] = useState(['All', 'Accessories', 'Toys', 'Housing', 'Food', 'Health', 'Others']);
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     
@@ -35,10 +36,10 @@ const ProductsShopPage = () => {
         fetchProducts();
     }, []);
 
-    // Filter products based on selected category
-    const filteredProducts = selectedCategory === 'All'
-        ? products
-        : products.filter(product => product.category === selectedCategory);
+    const filteredProducts = products.filter(product => 
+        (selectedCategory === 'All' || product.category === selectedCategory) &&
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     // Calculate pagination
     const offset = currentPage * itemsPerPage;
@@ -71,24 +72,41 @@ const ProductsShopPage = () => {
                 </div>
             </div>
 
-            {/* Category Filter */}
-            <div className="mb-8 flex flex-wrap gap-4">
-                {categories.map(category => (
-                    <button
-                        key={category}
-                        onClick={() => {
-                            setSelectedCategory(category);
+            {/* Search and Category Filter */}
+            <div className="mb-8 flex flex-wrap gap-4 items-center">
+                {/* Search Input */}
+                <div className="flex-grow">
+                    <input 
+                        type="text" 
+                        placeholder="Search products..." 
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
                             setCurrentPage(0);
                         }}
-                        className={`px-4 py-2 rounded ${
-                            selectedCategory === category
-                            ? 'bg-rose-400 text-white'
-                            : 'bg-rose-200 hover:bg-rose-300'
-                        }`}
-                    >
-                        {category}
-                    </button>
-                ))}
+                        className="w-full px-4 py-2 border border-rose-300 rounded focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    />
+                </div>
+
+                {/* Category Buttons */}
+                <div className="flex flex-wrap gap-2">
+                    {categories.map(category => (
+                        <button
+                            key={category}
+                            onClick={() => {
+                                setSelectedCategory(category);
+                                setCurrentPage(0);
+                            }}
+                            className={`px-4 py-2 rounded ${
+                                selectedCategory === category
+                                ? 'bg-rose-400 text-white'
+                                : 'bg-rose-200 hover:bg-rose-300'
+                            }`}
+                        >
+                            {category}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Product Grid */}
@@ -100,7 +118,7 @@ const ProductsShopPage = () => {
 
             {filteredProducts.length === 0 && (
                 <div className="text-center text-gray-500 mt-8">
-                    No products found in this category
+                    No products found
                 </div>
             )}
 
