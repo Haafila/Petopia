@@ -56,7 +56,7 @@ const Register = () => {
           <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required className="w-full p-2 border rounded" />
           <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleChange} required className="w-full p-2 border rounded" />
 
-          <select name="role" value={formData.role} onChange={handleChange} required className="w-full p-2 border rounded">
+          <select name="role" value={formData.role} onChange={handleChange} required className="w-full p-2 border rounded" style={{ display: 'none' }}>
             <option value="customer">Customer</option>
             <option value="admin">Admin</option>
           </select>
