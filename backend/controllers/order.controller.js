@@ -1,6 +1,7 @@
 import Order from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
 
+// Placing an order
 export const placeOrder = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -104,12 +105,13 @@ export const cancelOrder = async (req, res) => {
   }
 };
 
+// Get orders belong to the logged in user
 export const getUserOrders = async (req, res) => {
   try {
-      // Ensure user is authenticated
+      // is authenticated ?
       if (!req.user || !req.user._id) {
         const userId = req.user?._id ? req.user._id.toString() : 'not available';
-        console.log(`Debug: User ID in session - ${userId}`); // Debug log
+        console.log(`Debug: User ID in session - ${userId}`); // for debugging
         return res.status(401).json({ 
             error: `Unauthorized: User not found. User ID: ${userId}` 
         });
@@ -127,6 +129,7 @@ export const getUserOrders = async (req, res) => {
   }
 };
 
+// Get all orders (Admin)
 export const getAllOrders = async (req, res) => {
     try {
       const orders = await Order.find().populate("user", "name email").sort({ createdAt: -1 });
@@ -136,6 +139,7 @@ export const getAllOrders = async (req, res) => {
     }
 };
 
+// Update order status
 export const updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -158,6 +162,7 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+// Update payment status
 export const updatePaymentStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -180,6 +185,7 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
+// Update both order status and payment status
 export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;

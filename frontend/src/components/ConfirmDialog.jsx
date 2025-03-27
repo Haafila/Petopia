@@ -1,6 +1,6 @@
 import React, { useState, useCallback, createContext, useContext } from 'react';
 
-// Create context for the confirmation dialog
+// Context confirmation dialog
 const ConfirmDialogContext = createContext(null);
 
 // Main component
@@ -100,7 +100,7 @@ export const ConfirmDialogProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the confirm dialog
+// Custom hook
 export const useConfirmDialog = () => {
   const context = useContext(ConfirmDialogContext);
   if (!context) {

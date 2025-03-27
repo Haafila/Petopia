@@ -163,7 +163,7 @@ const OrderManagementPage = () => {
 
     const handleFilterApply = (filters) => {
         if (!filters) {
-            // Reset to all orders
+            // Reset 
             setFilteredOrders(orders);
             setCurrentPage(0);
             return;
@@ -191,7 +191,7 @@ const OrderManagementPage = () => {
 
             if (dateTo) {
                 const toDate = new Date(dateTo);
-                toDate.setHours(23, 59, 59, 999); // End of the day
+                toDate.setHours(23, 59, 59, 999); 
                 if (orderDate > toDate) return false;
             }
 
@@ -324,7 +324,7 @@ const OrderManagementPage = () => {
                 )}
             </div>
 
-            {/* Pagination Component */}
+            {/* Pagination */}
             {filteredOrders.length > itemsPerPage && (
                 <div className="flex justify-center mt-4">
                     <ReactPaginate

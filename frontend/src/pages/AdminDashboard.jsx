@@ -49,7 +49,7 @@ export default function AdminDashboard() {
     cancelled: orders.filter(order => order.status === 'Cancelled').length
   };
 
-  // Find low stock products (assuming stock is less than 10)
+  // Find low stock products 
   const LOW_STOCK_THRESHOLD = 10;
   const lowStockProducts = products.filter(product => product.quantity < LOW_STOCK_THRESHOLD);
 
@@ -59,7 +59,6 @@ export default function AdminDashboard() {
       
       {/* Order Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Pending Orders Card */}
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-100 hover:shadow-lg transition-shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-700">Pending Orders</h2>
@@ -68,7 +67,6 @@ export default function AdminDashboard() {
           <div className="text-4xl font-bold text-blue-600">{orderStats.pending}</div>
         </div>
 
-        {/* Processing Orders Card */}
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-100 hover:shadow-lg transition-shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-700">Processing Orders</h2>
@@ -77,7 +75,6 @@ export default function AdminDashboard() {
           <div className="text-4xl font-bold text-green-600">{orderStats.processing}</div>
         </div>
 
-        {/* Cancelled Orders Card */}
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-100 hover:shadow-lg transition-shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-700">Cancelled Orders</h2>

@@ -87,7 +87,7 @@ const ProductForm = ({ product, onSubmit, onClose }) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Image URL</label>
-                        <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className="w-full px-4 py-2 border rounded" required />
+                        <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className="w-full px-4 py-2 border rounded" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Quantity</label>

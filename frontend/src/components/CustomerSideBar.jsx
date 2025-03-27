@@ -39,12 +39,12 @@ const CustomerSideBar = () => {
             </Link>
             </li>
           <li>
-            <Link to="/account" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
+            <Link to="/customer/#" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaUser className="mr-3" /> : <FaUser />} {isOpen && "My Account"}
             </Link>
           </li>
           <li>
-            <Link to="/mypets" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
+            <Link to="/customer/#" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "My Pets"}
             </Link>
           </li>
@@ -74,7 +74,7 @@ const CustomerSideBar = () => {
             )}
           </li>
           <li>
-            <Link to="/adopt" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
+            <Link to="/customer/#" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaHeart className="mr-3" /> : <FaHeart />} {isOpen && "Adopt a Friend"}
             </Link>
           </li>

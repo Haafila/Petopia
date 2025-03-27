@@ -49,7 +49,10 @@ const UserOrdersPage = () => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
 
-  if (loading) return <div className="text-center p-6">Loading your orders...</div>;
+  if (loading) return <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+                        <p className="mt-2 text-gray-600">Loading your orders...</p>
+                      </div>;
   if (error) return <div className="text-center p-6 text-red-500">{error}</div>;
   if (orders.length === 0) {
     return (

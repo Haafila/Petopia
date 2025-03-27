@@ -14,7 +14,7 @@ export const getProducts = async (req, res) => {
 export const getProduct = async (req, res) => {
 	const { id } = req.params;
   
-	// Check if the ID is valid
+	// id validation
 	if (!mongoose.Types.ObjectId.isValid(id)) {
 	  return res.status(404).json({ success: false, message: "Invalid Product Id" });
 	}
@@ -22,7 +22,7 @@ export const getProduct = async (req, res) => {
 	try {
 	  const product = await Product.findById(id);
   
-	  // Check if the product exists
+	  // product exist?
 	  if (!product) {
 		return res.status(404).json({ success: false, message: "Product not found" });
 	  }
@@ -38,7 +38,7 @@ export const getProduct = async (req, res) => {
 export const createProduct = async (req, res) => {
 	const product = req.body; // user will send this data
 
-	if (!product.name || !product.price || !product.imageUrl || !product.category || !product.quantity) {
+	if (!product.name || !product.price || !product.category || !product.quantity) {
 		return res.status(400).json({ success: false, message: "Please provide the necessary fields" });
 	}
 

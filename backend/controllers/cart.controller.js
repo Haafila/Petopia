@@ -2,13 +2,14 @@ import mongoose from 'mongoose';
 import Cart from '../models/cart.model.js';
 import Product from '../models/product.model.js';
 
+// Clear cart
 export const clearCart = async (req, res) => {
   try {
     if (!req.session.user) {
       return res.status(401).json({ success: false, message: "User not logged in" });
     }
 
-    // Find and update the cart
+    // Find and update cart
     const cart = await Cart.findOneAndUpdate(
       { user: req.session.user._id },
       { $set: { items: [] } }, // Clear all items
@@ -26,6 +27,7 @@ export const clearCart = async (req, res) => {
   }
 };
 
+// Get user's cart
 export const getCart = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -53,6 +55,7 @@ export const getCart = async (req, res) => {
   }
 };
 
+// Add product to cart
 export const addToCart = async (req, res) => {
     const { productId, quantity } = req.body;
   
@@ -61,56 +64,55 @@ export const addToCart = async (req, res) => {
         return res.status(401).json({ success: false, message: "User not logged in" });
       }
   
-      console.log("Adding product to cart. Product ID:", productId); // Debug log
+      console.log("Adding product to cart. Product ID:", productId); // for debugging
   
-      // Validate product ID
+      // Product ID valid ?
       if (!mongoose.isValidObjectId(productId)) {
         return res.status(400).json({ success: false, message: "Invalid product ID" });
       }
   
-      // Check if product exists
-      console.log("Searching for product in database..."); // Debug log
+      // Product exists in database ?
+      console.log("Searching for product in database..."); // for debugging
       const product = await Product.findById(productId);
-      console.log("Product found:", product); // Debug log
+      console.log("Product found:", product); // for debugging
   
       if (!product) {
         return res.status(404).json({ success: false, message: "Product not found" });
       }
   
-      // Find user's cart or create new one
+      // Find user's cart or create a new one for user
       let cart = await Cart.findOne({ user: req.session.user._id });
   
       if (!cart) {
-        console.log("Creating new cart for user:", req.session.user._id); // Debug log
+        console.log("Creating new cart for user:", req.session.user._id); // for debugging
         cart = new Cart({
           user: req.session.user._id,
           items: [],
         });
       }
   
-      // Check if product already in cart
+      // product already in cart? yes: update quantity (+1), no: add new item
       const itemIndex = cart.items.findIndex(
         (item) => item.product.toString() === productId
       );
   
       if (itemIndex > -1) {
-        // Update quantity if product exists
         cart.items[itemIndex].quantity += quantity;
-        console.log("Updated product quantity in cart:", productId); // Debug log
+        console.log("Updated product quantity in cart:", productId); // for debugging
       } else {
-        // Add new item
         cart.items.push({ product: productId, quantity });
-        console.log("Added new product to cart:", productId); // Debug log
+        console.log("Added new product to cart:", productId); // for debugging
       }
   
       await cart.save();
       res.status(200).json({ success: true, data: cart });
     } catch (err) {
-      console.error("Error adding to cart:", err.message); // Debug log
+      console.error("Error adding to cart:", err.message); // for debugging
       res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
+// Remove product from cart
 export const removeFromCart = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -139,6 +141,7 @@ export const removeFromCart = async (req, res) => {
   }
 };
 
+// Update cart item
 export const updateCartItem = async (req, res) => {
   const { quantity } = req.body;
   const { itemId } = req.params;
@@ -163,9 +166,8 @@ export const updateCartItem = async (req, res) => {
       item.quantity = quantity;
       await cart.save();
 
-      // Re-fetch the cart with product details populated
+      // Re-fetch the cart
       const updatedCart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
-
       res.status(200).json({ success: true, data: updatedCart });
   } catch (err) {
       console.error("Error updating cart item:", err.message);

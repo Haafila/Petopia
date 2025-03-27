@@ -36,7 +36,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Add this clearCart function
+  // Clear cart and refresh data
   const clearCart = async () => {
     try {
       await axios.delete("/api/cart/clear"); 
@@ -82,5 +82,5 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the CartContext
+// Custom hook to use cart data
 export const useCart = () => useContext(CartContext);

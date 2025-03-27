@@ -7,7 +7,7 @@ const router = express.Router();
 // Customer Routes
 router.get("/", sessionAuth, getCart); 
 router.post("/add", sessionAuth, addToCart); 
-router.delete("/clear", clearCart); 
+router.delete("/clear", sessionAuth, clearCart); 
 router.delete("/remove/:itemId", sessionAuth, removeFromCart); 
 router.put("/update/:itemId", sessionAuth, updateCartItem); 
 

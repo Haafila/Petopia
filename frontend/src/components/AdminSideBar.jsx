@@ -41,7 +41,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/admin/users"
+                    to="/admin/#"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaUsers className="mr-3" /> : <FaUsers />} {isOpen && "Users"}
@@ -49,7 +49,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/admin/pets"
+                    to="/admin/#"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "Pets"}
@@ -81,7 +81,7 @@ const AdminSideBar = () => {
                 </li>
                 <li>
                 <Link
-                    to="/admin/adoption"
+                    to="/admin/#"
                     className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
                 >
                     {isOpen ? <FaHeart className="mr-3" /> : <FaHeart />} {isOpen && "Adoptions"}
