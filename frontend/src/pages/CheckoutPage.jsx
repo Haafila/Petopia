@@ -60,13 +60,12 @@ const CheckoutPage = () => {
       const response = await axios.post('/api/orders/place-order', orderData);
   
       if (paymentMethod === 'Card') {
-        // Pass the entire order data to the payment page
         navigate(`/customer/payment?serviceType=Order&amount=${cartTotal}&userName=${formData.name}`, { 
           state: { 
             serviceType: 'Order', 
             amount: cartTotal, 
             userName: formData.name,
-            orderData: response.data.data // Pass the created order data
+            orderData: response.data.data 
           }
         });
       } else {
