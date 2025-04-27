@@ -72,10 +72,18 @@ const OrderManagementPage = () => {
             console.log("Updating:", updateType, "for order:", editingOrder._id, "to status:", updatedStatus);
             
             if (updateType === 'order') {
+                // Special handling for cancellation
+                const isBeingCancelled = updatedStatus === "Cancelled";
+                
                 await axios.put(`/api/orders/${editingOrder._id}`, { 
                     status: updatedStatus 
                 });
-                toast.success('Order status updated successfully');
+                
+                if (isBeingCancelled) {
+                    toast.success('Order cancelled successfully. Notification email sent to customer.');
+                } else {
+                    toast.success('Order status updated successfully');
+                }
             } else {
                 await axios.put(`/api/orders/${editingOrder._id}`, { 
                     paymentStatus: updatedStatus 
@@ -202,6 +210,24 @@ const OrderManagementPage = () => {
         setCurrentPage(0);
     };
 
+    // Confirmation dialog specifically for cancellation
+    const handleCancelOrder = (order) => {
+        openConfirmDialog({
+            title: 'Cancel Order',
+            message: 'Are you sure you want to cancel this order? An email notification will be sent to the customer.',
+            confirmText: 'Cancel Order',
+            onConfirm: async () => {
+                try {
+                    await axios.put(`/api/orders/${order._id}`, { status: 'Cancelled' });
+                    toast.success('Order cancelled successfully. Customer has been notified via email.');
+                    fetchOrders();
+                } catch (error) {
+                    toast.error('Failed to cancel order');
+                }
+            }
+        });
+    };
+
     return (
         <div className="container h-100 mx-auto px-6 py-8 mx-auto">
             <h1 className="text-3xl font-extrabold mb-4">Order Management</h1>
@@ -229,6 +255,10 @@ const OrderManagementPage = () => {
                     onPaymentStatusUpdate={() => {
                         closeDetails();
                         handleStatusUpdate(viewDetails, 'payment');
+                    }}
+                    onCancelOrder={() => {
+                        closeDetails();
+                        handleCancelOrder(viewDetails);
                     }}
                     formatPrice={formatPrice}
                     renderStatusBadge={renderStatusBadge}
@@ -286,7 +316,7 @@ const OrderManagementPage = () => {
                                             <div className="flex space-x-2">
                                                 <button
                                                     onClick={() => handleViewDetails(order)}
-                                                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-150"
+                                                    className="bg-pink-500 text-white px-3 py-1 rounded-md hover:bg-pink-600 transition duration-150"
                                                 >
                                                     View
                                                 </button>
@@ -302,6 +332,14 @@ const OrderManagementPage = () => {
                                                 >
                                                     Update Payment
                                                 </button>
+                                                {order.status !== 'Cancelled' && (
+                                                    <button
+                                                        onClick={() => handleCancelOrder(order)}
+                                                        className="bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition duration-150"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() => handleDelete(order._id)}
                                                     className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-150"

@@ -1,12 +1,70 @@
 import PDFDocument from 'pdfkit';
 import Order from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
-import path        from 'path';
-import fs          from 'fs';
+import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
+import nodemailer from 'nodemailer'; 
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+const __dirname = path.dirname(__filename);
+
+// Email configuration
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,       
+  port: Number(process.env.EMAIL_PORT),
+  secure: false,                       
+  auth: {
+    user: process.env.EMAIL_USER,     
+    pass: process.env.EMAIL_PASS      
+  }
+});
+
+console.log('SMTP config:', {
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  user: process.env.EMAIL_USER ? 'loaded' : 'missing',
+});
+
+// Send cancellation email
+const sendOrderCancellationEmail = async (order, user) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: user.email,
+      subject: `Order Cancellation - Order #${order._id.toString().substring(order._id.toString().length - 8)}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #e91e63;">Order Cancellation Notice</h2>
+          <p>Dear ${user.name},</p>
+          <p>We're writing to inform you that your order <strong>#${order._id.toString().substring(order._id.toString().length - 8)}</strong> has been cancelled.</p>
+          
+          <h3>Order Summary:</h3>
+          <ul>
+            <li>Order ID: ${order._id.toString()}</li>
+            <li>Total Amount: LKR ${order.totalAmount.toFixed(2)}</li>
+            <li>Payment Method: ${order.paymentMethod}</li>
+          </ul>
+          
+          <p>If you have any questions or concerns about this cancellation, please contact our customer service team.</p>
+          
+          <p>Thank you for your understanding.</p>
+          
+          <p>Best regards,<br>Petopia Team</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Cancellation email sent to ${user.email} for Order #${order._id}`);
+    return true;
+  } catch (error) {
+    console.error('Error sending cancellation email:', error);
+    return false;
+  }
+};
 
 // Placing an order
 export const placeOrder = async (req, res) => {
@@ -66,16 +124,16 @@ export const placeOrder = async (req, res) => {
 // Delete order
 export const deleteOrder = async (req, res) => {
   try {
-      const deletedOrder = await Order.findByIdAndDelete(req.params.id);
+    const deletedOrder = await Order.findByIdAndDelete(req.params.id);
       
-      if (!deletedOrder) {
-          return res.status(404).json({ message: 'Order not found' });
-      }
+    if (!deletedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
       
-      res.status(200).json({ message: 'Order deleted successfully' });
+    res.status(200).json({ message: 'Order deleted successfully' });
   } catch (error) {
-      console.error('Error deleting order:', error);
-      res.status(500).json({ message: 'Failed to delete order' });
+    console.error('Error deleting order:', error);
+    res.status(500).json({ message: 'Failed to delete order' });
   }
 };
 
@@ -96,15 +154,22 @@ export const getOrderDetails = async (req, res) => {
 export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("user", "name email");
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
     if (order.status !== "Pending") {
       return res.status(400).json({ success: false, message: "Order cannot be canceled at this stage" });
     }
 
+    // Update status
     order.status = "Cancelled";
     await order.save();
+    
+    // Send cancellation email
+    if (order.user && order.user.email) {
+      await sendOrderCancellationEmail(order, order.user);
+    }
+    
     res.json({ success: true, message: "Order cancelled successfully", order });
   } catch (error) {
     console.error("Error cancelling order:", error.message);
@@ -112,38 +177,38 @@ export const cancelOrder = async (req, res) => {
   }
 };
 
-// Get orders belong to the logged in user
+// Get all user orders
 export const getUserOrders = async (req, res) => {
   try {
-      // is authenticated ?
-      if (!req.user || !req.user._id) {
-        const userId = req.user?._id ? req.user._id.toString() : 'not available';
-        console.log(`Debug: User ID in session - ${userId}`); // for debugging
-        return res.status(401).json({ 
-            error: `Unauthorized: User not found. User ID: ${userId}` 
-        });
-      }
+    // is authenticated ?
+    if (!req.user || !req.user._id) {
+      const userId = req.user?._id ? req.user._id.toString() : 'not available';
+      console.log(`Debug: User ID in session - ${userId}`); // for debugging
+      return res.status(401).json({ 
+        error: `Unauthorized: User not found. User ID: ${userId}` 
+      });
+    }
 
-      // Fetch user orders sorted by creation date (newest first)
-      const orders = await Order.find({ user: req.user._id })
+    // Fetch user orders
+    const orders = await Order.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .populate("products.product", "name price imageUrl");
 
-      res.status(200).json(orders);
+    res.status(200).json(orders);
   } catch (error) {
-      console.error("Error fetching user orders:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 // Get all orders (Admin)
 export const getAllOrders = async (req, res) => {
-    try {
-      const orders = await Order.find().populate("user", "name email").sort({ createdAt: -1 });
-      res.json(orders);
-    } catch (error) {
-      res.status(500).json({ error: "Server error" });
-    }
+  try {
+    const orders = await Order.find().populate("user", "name email").sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
 // Update order status
@@ -155,11 +220,19 @@ export const updateOrderStatus = async (req, res) => {
     console.log("Updating Order Status - Order ID:", orderId); // Debug
     console.log("New Status:", status); // Debug
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("user", "name email");
     if (!order) return res.status(404).json({ error: "Order not found" });
 
+    const previousStatus = order.status; // Store previous status
     order.status = status;
     await order.save();
+    
+    // status change to Cancelled
+    if (status === "Cancelled" && previousStatus !== "Cancelled") {
+      if (order.user && order.user.email) {
+        await sendOrderCancellationEmail(order, order.user);
+      }
+    }
 
     console.log("Updated Order:", order); // Debug
     res.json({ message: "Order status updated", order });
@@ -171,6 +244,7 @@ export const updateOrderStatus = async (req, res) => {
 
 // Update payment status
 export const updatePaymentStatus = async (req, res) => {
+  // Existing code remains unchanged
   try {
     const { orderId } = req.params;
     const { paymentStatus } = req.body;
@@ -192,7 +266,7 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
-// Update both order status and payment status
+// Update order status & payment status
 export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -206,10 +280,12 @@ export const updateOrder = async (req, res) => {
       return res.status(400).json({ error: "Invalid order ID format" });
     }
     
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate("user", "name email");
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
+    
+    const previousStatus = order.status; // Store previous status
     
     if (updateData.status) {
       order.status = updateData.status;
@@ -223,13 +299,22 @@ export const updateOrder = async (req, res) => {
     
     await order.save();
     
+    // order status change to Cancelled
+    if (updateData.status === "Cancelled" && previousStatus !== "Cancelled") {
+      if (order.user && order.user.email) {
+        const emailSent = await sendOrderCancellationEmail(order, order.user);
+        console.log("Cancellation email status:", emailSent ? "Sent" : "Failed");
+      } else {
+        console.log("Could not send email: User or email not found");
+      }
+    }
+    
     res.json({
       message: "Order updated successfully",
       order
     });
   } catch (error) {
     console.error("Error updating order:", error);
-    // Send more detailed error information
     res.status(500).json({ 
       error: "Server error", 
       details: error.message,
@@ -260,13 +345,13 @@ export async function downloadInvoice(req, res) {
     
     // Theme colors
     const colors = {
-      primary: '#F5C3C2',  // light pink
-      accent: '#D3A4A4',  // darker pink
-      text: '#333333',  // dark gray
+      primary: '#F5C3C2',  
+      accent: '#D3A4A4',  
+      text: '#333333',  
       border: '#CCCCCC'
     };
     
-    // === Header with background ===
+    // Header
     doc
       .rect(0, 0, doc.page.width, 170)
       .fill(colors.primary);
@@ -284,7 +369,7 @@ export async function downloadInvoice(req, res) {
       .fontSize(28)
       .text('INVOICE', 350, 85);
     
-    // === Order & Customer Info ===
+    // Order and Customer Information
     const infoY = 200;
     
     // Invoice number and date
@@ -298,7 +383,7 @@ export async function downloadInvoice(req, res) {
       .fontSize(12)
       .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 420, infoY);
     
-    // Bill To section
+    // Bill to section
     doc
       .font('Courier-Bold')
       .text('Bill To:', 50, infoY + 30)
@@ -306,7 +391,7 @@ export async function downloadInvoice(req, res) {
       .text(order.user?.name || 'N/A', 50, infoY + 50)
       .text(order.user?.email || 'N/A', 50, infoY + 70);
     
-    // === Table Header ===
+    // table header
     const tableTop = infoY + 110;
     const cols = { item: 50, qty: 300, unit: 370, line: 460 };
     doc
@@ -318,7 +403,7 @@ export async function downloadInvoice(req, res) {
       .text('Line Total', cols.line, tableTop)
       .moveDown(0.5);
 
-    // === Table Rows ===
+    // table rows
     let y = tableTop + 20;
     doc.font('Courier').fontSize(10);
     order.products.forEach(({ product, quantity }) => {
@@ -342,7 +427,7 @@ export async function downloadInvoice(req, res) {
         .stroke();
     });
     
-    // === Grand Total Box ===
+    // total box
     y += 20;
     
     doc
@@ -355,7 +440,7 @@ export async function downloadInvoice(req, res) {
         align: 'right'
       });
     
-    // === Thank You Message ===
+    // Thank you msg
     doc
       .font('Courier-Oblique')
       .fontSize(14)
