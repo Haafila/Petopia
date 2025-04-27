@@ -10,6 +10,13 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["customer", "admin", "doctor"], default: "customer" },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  deliveryDetails: {
+    name: { type: String },
+    address: { type: String },
+    city: { type: String },
+    postalCode: { type: String },
+    phone: { type: String },
+  },
 });
 
 const User = mongoose.model("User", userSchema);

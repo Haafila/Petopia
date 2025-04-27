@@ -19,6 +19,8 @@ import LandingLayout from './layouts/LandingLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
 
+import UserProfilePage from './pages/UserProfilePage';
+
 import AdminPayment from './components/AdminPayment';
 import MakePayment from './components/MakePayment';
 import FinanceManagementPage from './pages/FinanceManagementPage';
@@ -72,6 +74,7 @@ function App() {
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminDashboardLayout session={session}/>}>
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="profile" element={<UserProfilePage />} />
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
         <Route path="finance" element={<FinanceManagementPage />} />
@@ -82,6 +85,7 @@ function App() {
       {/* Customer Routes */}
       <Route path="/customer" element={<CustomerDashboardLayout session={session}/>}>
         <Route path="dashboard" element={<CustomerDashboard />} />
+        <Route path="profile" element={<UserProfilePage />} />
         <Route path="products" element={<ProductsStorePage />} />
         <Route path="payment" element={<MakePayment />} />
         <Route path="products/cart" element={<CartPage />} />

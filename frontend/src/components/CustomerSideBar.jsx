@@ -39,7 +39,7 @@ const CustomerSideBar = () => {
             </Link>
             </li>
           <li>
-            <Link to="/customer/#" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
+            <Link to="/customer/profile" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaUser className="mr-3" /> : <FaUser />} {isOpen && "My Account"}
             </Link>
           </li>
