@@ -1,5 +1,12 @@
+import PDFDocument from 'pdfkit';
 import Order from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
+import path        from 'path';
+import fs          from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
 
 // Placing an order
 export const placeOrder = async (req, res) => {
@@ -230,3 +237,134 @@ export const updateOrder = async (req, res) => {
     });
   }
 };
+
+// Download invoice as PDF
+export async function downloadInvoice(req, res) {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId)
+      .populate('user', 'name email')
+      .populate('products.product', 'name price')
+      .lean();
+    
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    
+    // Prepare PDF
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=invoice-${orderId}.pdf`
+    );
+    doc.pipe(res);
+    
+    // Theme colors
+    const colors = {
+      primary: '#F5C3C2',  // light pink
+      accent: '#D3A4A4',  // darker pink
+      text: '#333333',  // dark gray
+      border: '#CCCCCC'
+    };
+    
+    // === Header with background ===
+    doc
+      .rect(0, 0, doc.page.width, 170)
+      .fill(colors.primary);
+    
+    // Logo placement
+    const logoPath = path.join(__dirname, '../assets/logo1.png');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 30, { width: 120 });
+    }
+    
+    // Invoice title
+    doc
+      .fillColor(colors.text)
+      .font('Courier-Bold')
+      .fontSize(28)
+      .text('INVOICE', 350, 85);
+    
+    // === Order & Customer Info ===
+    const infoY = 200;
+    
+    // Invoice number and date
+    doc
+      .font('Courier')
+      .fontSize(12)
+      .fillColor(colors.text)
+      .text(`Invoice #: ${orderId}`, 50, infoY);
+    
+    doc
+      .fontSize(12)
+      .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 420, infoY);
+    
+    // Bill To section
+    doc
+      .font('Courier-Bold')
+      .text('Bill To:', 50, infoY + 30)
+      .font('Courier')
+      .text(order.user?.name || 'N/A', 50, infoY + 50)
+      .text(order.user?.email || 'N/A', 50, infoY + 70);
+    
+    // === Table Header ===
+    const tableTop = infoY + 110;
+    const cols = { item: 50, qty: 300, unit: 370, line: 460 };
+    doc
+      .font('Courier-Bold')
+      .fontSize(12)
+      .text('Item', cols.item, tableTop)
+      .text('Qty', cols.qty, tableTop)
+      .text('Unit Price', cols.unit, tableTop)
+      .text('Line Total', cols.line, tableTop)
+      .moveDown(0.5);
+
+    // === Table Rows ===
+    let y = tableTop + 20;
+    doc.font('Courier').fontSize(10);
+    order.products.forEach(({ product, quantity }) => {
+      const name      = product?.name || 'Unknown';
+      const unitPrice = product?.price?.toFixed(2) || '0.00';
+      const lineTotal = (product?.price * quantity).toFixed(2);
+
+      doc
+        .text(name,          cols.item, y)
+        .text(quantity,      cols.qty,  y)
+        .text(`LKR ${unitPrice}`, cols.unit, y)
+        .text(`LKR ${lineTotal}`, cols.line, y);
+
+      y += 20;
+      // light separator
+      doc
+        .strokeColor(colors.border)
+        .lineWidth(0.3)
+        .moveTo(cols.item, y - 5)
+        .lineTo(cols.line + 60, y - 5)
+        .stroke();
+    });
+    
+    // === Grand Total Box ===
+    y += 20;
+    
+    doc
+      .font('Courier-Bold')
+      .fontSize(12)
+      .text('Grand', 370, y)
+      .text(`Total: LKR`, 370, y + 20)
+      .fontSize(14)
+      .text(`${order.totalAmount.toFixed(2)}`, 400, y + 20, {
+        align: 'right'
+      });
+    
+    // === Thank You Message ===
+    doc
+      .font('Courier-Oblique')
+      .fontSize(14)
+      .fillColor(colors.accent)
+      .text('Thank you for shopping with Petopia Pet Store!', 20, y + 80, { align: 'right' })
+    
+    doc.end();
+  } catch (err) {
+    console.error('Error generating invoice:', err);
+    res.status(500).json({ message: 'Could not generate invoice' });
+  }
+}

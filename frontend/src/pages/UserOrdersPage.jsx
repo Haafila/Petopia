@@ -44,6 +44,27 @@ const UserOrdersPage = () => {
     });
   };
 
+  const handleDownloadInvoice = async (orderId) => {
+    try {
+      const response = await axios.get(
+        `/api/orders/${orderId}/invoice`,
+        { responseType: 'blob' }
+      );
+
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: 'application/pdf' })
+      );
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice-${orderId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('Invoice download failed:', err);
+      toast.error('Failed to download invoice. Please try again.');
+    }
+  };
 
   const formatDate = (dateString) => {
     return format(new Date(dateString), 'MMM dd, yyyy');
@@ -110,6 +131,14 @@ const UserOrdersPage = () => {
                   className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                 >
                   Cancel Order
+                </button>
+              )}
+              {order.status === 'Delivered' && (
+                <button
+                  onClick={() => handleDownloadInvoice(order._id)}
+                  className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700"
+                >
+                  Download Invoice
                 </button>
               )}
             </div>
