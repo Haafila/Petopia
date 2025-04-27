@@ -90,7 +90,7 @@ const OrderFilter = ({ onFilterApply }) => {
             
             console.log('Sending report request:', reportRequest);
             
-            // Make API call to generate report
+            // API call to generate report
             const response = await axios.post('/api/reports/generate', reportRequest, {
                 responseType: 'blob' 
             });
@@ -200,7 +200,7 @@ const OrderFilter = ({ onFilterApply }) => {
             <div className="flex flex-wrap justify-between items-center mt-4">
                 <button
                     onClick={toggleReportOptions}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition"
+                    className="bg-rose-500 text-white px-4 py-2 rounded hover:bg-rose-600 transition"
                 >
                     {showReportOptions ? 'Hide Report Options' : 'Generate Report'}
                 </button>
@@ -223,11 +223,10 @@ const OrderFilter = ({ onFilterApply }) => {
             
             {/* Report Options */}
             {showReportOptions && (
-                <div className="mt-4 p-4 border border-indigo-200 rounded-lg bg-indigo-50">
-                    <h3 className="text-md font-semibold mb-3 text-indigo-700">Report Options</h3>
+                <div className="mt-4 p-4 border border-rose-200 rounded-lg bg-rose-50">
+                    <h3 className="text-md font-semibold mb-3 text-rose-700">Report Options</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                        {/* Report Type */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Report Type
@@ -235,15 +234,14 @@ const OrderFilter = ({ onFilterApply }) => {
                             <select
                                 value={reportType}
                                 onChange={(e) => setReportType(e.target.value)}
-                                className="w-full border border-indigo-300 rounded px-2 py-1"
+                                className="w-full border border-rose-300 rounded px-2 py-1"
                             >
                                 <option value="orders">Orders Summary</option>
                                 <option value="revenue">Revenue Analysis</option>
                                 <option value="products">Product Sales</option>
                             </select>
                         </div>
-                        
-                        {/* Format */}
+                
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Format
@@ -251,15 +249,13 @@ const OrderFilter = ({ onFilterApply }) => {
                             <select
                                 value={reportFormat}
                                 onChange={(e) => setReportFormat(e.target.value)}
-                                className="w-full border border-indigo-300 rounded px-2 py-1"
+                                className="w-full border border-rose-300 rounded px-2 py-1"
                             >
                                 <option value="pdf">PDF</option>
-                                <option value="csv">CSV</option>
                                 <option value="excel">Excel</option>
                             </select>
                         </div>
-                        
-                        {/* Include Logo */}
+                      
                         <div className="flex items-center mt-6">
                             <input
                                 type="checkbox"
@@ -273,8 +269,7 @@ const OrderFilter = ({ onFilterApply }) => {
                             </label>
                         </div>
                     </div>
-                    
-                    {/* Custom Message */}
+       
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Custom Report Message (Optional)
@@ -283,7 +278,7 @@ const OrderFilter = ({ onFilterApply }) => {
                             value={customMessage}
                             onChange={(e) => setCustomMessage(e.target.value)}
                             placeholder="Add a custom message to appear on the report header..."
-                            className="w-full border border-indigo-300 rounded px-2 py-1 h-20"
+                            className="w-full border border-rose-300 rounded px-2 py-1 h-20"
                         />
                     </div>
                     
@@ -291,7 +286,7 @@ const OrderFilter = ({ onFilterApply }) => {
                         <button
                             onClick={handleGenerateReport}
                             disabled={isGenerating}
-                            className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition flex items-center"
+                            className="bg-rose-500 text-white px-4 py-2 rounded hover:bg-rose-600 transition flex items-center"
                         >
                             {isGenerating ? (
                                 <>

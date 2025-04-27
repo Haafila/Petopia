@@ -1,5 +1,5 @@
 import express from "express";
-import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder } from "../controllers/order.controller.js";
+import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder, downloadInvoice } from "../controllers/order.controller.js";
 import sessionAuth from "../middleware/auth.session.js";
 
 const router = express.Router();
@@ -9,6 +9,7 @@ router.post("/place-order", sessionAuth, placeOrder);
 router.get("/my-orders", sessionAuth, getUserOrders);
 router.get("/:orderId", getOrderDetails);
 router.put("/:orderId/cancel", cancelOrder);
+router.get('/:orderId/invoice', downloadInvoice);
 
 // Admin Routes
 router.get("/", getAllOrders);
