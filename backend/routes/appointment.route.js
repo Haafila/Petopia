@@ -1,5 +1,5 @@
 import express from 'express';
-import { addAppointment , addNewAppointment, getAppointments, updateAppointment, getPetsByUser, filterAppointments, updateAppointmentStatus, getUserAppointments, getPetById, getPetNameForAppointment, cancelAppointment, deleteTimeSlot, getAppointmentsByServiceType, completeAppointment} from '../controllers/appointment.controller.js';
+import { addAppointment , addNewAppointment, getAppointments, updateAppointment, getPetsByUser, filterAppointments, updateAppointmentStatus, getUserAppointments, getPetById, getPetNameForAppointment, cancelAppointment, deleteTimeSlot, getAppointmentsByServiceType, completeAppointment } from '../controllers/appointment.controller.js';
 
 const router = express.Router();
 
@@ -30,6 +30,7 @@ router.post("/timeslots/delete", deleteTimeSlot);
 router.get("/:serviceType", getAppointmentsByServiceType);
 
 router.put("/complete/:id", completeAppointment);
+
 
 
 
