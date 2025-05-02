@@ -11,7 +11,11 @@ function StaffAppointmentList({ serviceType }) {
         const response = await axios.get(
           `http://localhost:5000/appointments/${serviceType}`
         );
-        setAppointments(response.data);
+        // 👉 Filter appointments where status is Confirmed or Completed
+        const filteredAppointments = response.data.filter(
+          (appt) => appt.status === "Confirmed" || appt.status === "Completed"
+        );
+        setAppointments(filteredAppointments);
       } catch (error) {
         console.error("Error fetching appointments", error);
       } finally {
@@ -37,97 +41,92 @@ function StaffAppointmentList({ serviceType }) {
     }
   };
 
-
-
   return (
-    <div className="p-4 bg-[var(--white)] rounded-md shadow-sm max-w-md mx-auto mt-20">
-      <h2 className="text-xl font-semibold mb-3 text-[var(--dark-brown)]">
+    <div className="p-6 bg-[#ffffff] rounded-lg shadow-md max-w-4xl mx-auto mt-8">
+      <h2 className="text-2xl font-bold mb-4 text-[#3d1e24]">
         {serviceType} Appointments
       </h2>
 
       {loading ? (
-        <p className="text-[var(--dark-brown)]">Loading...</p>
+        <div className="flex justify-center p-8">
+          <div className="animate-pulse text-[#3d1e24]">Loading...</div>
+        </div>
       ) : appointments.length > 0 ? (
-        <table className="w-full border-collapse border border-[var(--grey)] bg-[var(--white)] rounded-md text-sm">
-          <thead>
-            <tr className="bg-[var(--light-brown)] text-[var(--dark-brown)]">
-              {serviceType === "Boarding" ? (
-                <>
-                  <th className="border border-[var(--grey)] p-1">Start Date</th>
-                  <th className="border border-[var(--grey)] p-1">End Date</th>
-                </>
-              ) : (
-                <>
-                  <th className="border border-[var(--grey)] p-1">Date</th>
-                  <th className="border border-[var(--grey)] p-1">Time</th>
-                </>
-              )}
-              <th className="border border-[var(--grey)] p-1">Status</th>
-              <th className="border border-[var(--grey)] p-1">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointments.map((appointment) => (
-              <tr key={appointment._id} className="text-center">
+        <div className="overflow-x-auto rounded-lg border border-[#ccc4ba]">
+          <table className="w-full border-collapse bg-[#ffffff]">
+            <thead>
+              <tr className="bg-[#f8cd9a] text-[#3d1e24]">
                 {serviceType === "Boarding" ? (
                   <>
-                    <td className="border border-[var(--grey)] p-1">
-                      {appointment.details.boardingDetails.startDate.split("T")[0]}
-                    </td>
-                    <td className="border border-[var(--grey)] p-1">
-                      {appointment.details.boardingDetails.endDate.split("T")[0]}
-                    </td>
+                    <th className="px-4 py-3 text-left font-semibold">Start Date</th>
+                    <th className="px-4 py-3 text-left font-semibold">End Date</th>
                   </>
                 ) : (
                   <>
-                    <td className="border border-[var(--grey)] p-1">
-                      {appointment.date.split("T")[0]}
-                    </td>
-                    <td className="border border-[var(--grey)] p-1">
-                      {appointment.time}
-                    </td>
+                    <th className="px-4 py-3 text-left font-semibold">Date</th>
+                    <th className="px-4 py-3 text-left font-semibold">Time</th>
                   </>
                 )}
-                <td className="border border-[var(--grey)] p-1">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${appointment.status === "Booked"
-                        ? "text-yellow-800"
-                        : appointment.status === "Confirmed"
-                          ? "text-blue-800"
-                          : appointment.status === "Completed"
-                            ? "text-green-800"
-                            : appointment.status === "Cancelled"
-                              ? "text-red-800"
-                              : "text-gray-800"
-                      }`}
-                  >
-                    {appointment.status}
-                  </span>
-                </td>
-                <td className="border border-[var(--grey)] p-1">
-                  {appointment.status === "Confirmed" && (
-                    <button
-                      onClick={() => markAsCompleted(appointment._id)}
-                      className="bg-[var(--puppy-brown)] text-[var(--white)] px-2 py-1 rounded-sm text-xs hover:py-2"
-                    >
-                      Complete
-                    </button>
-                  )}
-                  {(appointment.status === "Completed" ||
-                    appointment.status === "Cancelled" ||
-                    appointment.status === "Booked") && (
-                      <span className="text-gray-500 text-xs">not allowed</span>
-                    )}
-                </td>
+                <th className="px-4 py-3 text-left font-semibold">Status</th>
+                <th className="px-4 py-3 text-right font-semibold">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {appointments.map((appointment) => (
+                <tr key={appointment._id} className="border-t border-[#ccc4ba] hover:bg-[#fef9ea]">
+                  {serviceType === "Boarding" ? (
+                    <>
+                      <td className="px-4 py-3 text-[#3d1e24]">
+                        {appointment.details.boardingDetails.startDate.split("T")[0]}
+                      </td>
+                      <td className="px-4 py-3 text-[#3d1e24]">
+                        {appointment.details.boardingDetails.endDate.split("T")[0]}
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-4 py-3 text-[#3d1e24]">
+                        {appointment.date.split("T")[0]}
+                      </td>
+                      <td className="px-4 py-3 text-[#3d1e24]">
+                        {appointment.time}
+                      </td>
+                    </>
+                  )}
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        appointment.status === "Confirmed"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {appointment.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {appointment.status === "Confirmed" ? (
+                      <button
+                        onClick={() => markAsCompleted(appointment._id)}
+                        className="bg-[#faab54] text-[#ffffff] px-4 py-2 rounded text-sm font-medium hover:bg-[#da828f] transition-colors duration-200"
+                      >
+                        Complete
+                      </button>
+                    ) : (
+                      <span className="text-green-800 text-sm">✓</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p className="text-[var(--dark-brown)]">No appointments found.</p>
+        <div className="p-8 text-center text-[#3d1e24] bg-[#fef9ea] rounded-lg border border-[#ccc4ba]">
+          No appointments found.
+        </div>
       )}
     </div>
-
   );
 }
 
