@@ -45,7 +45,12 @@ const AppointmentSchema = new mongoose.Schema({
     type: String, 
     enum: ["Booked", "Confirmed", "Completed", "Cancelled"], 
     default: "Booked" 
-  }
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
 });
 
 const Appointment = mongoose.model('Appointment', AppointmentSchema);
