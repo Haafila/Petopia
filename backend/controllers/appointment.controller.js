@@ -5,27 +5,67 @@ import Appointment from "../models/appointment.js";
 import Pet from "../models/pet.model.js";
 import User from "../models/user.model.js";
 import BookedSlot from "../models/timeslot.model.js";
+import nodemailer from 'nodemailer';
+
 
 export const addAppointment = async (req, res) => {
-    try {
-        const { petId, userId, serviceType, details, date, time, status } = req.body;
+  try {
+    const { petId, userId, serviceType, details, date, time, status, amount } = req.body;
 
-        const newAppointment = new Appointment({
-            petId,
-            userId,
-            serviceType,
-            details,
-            date,
-            time,
-            status: status || "Booked"
-        });
+    const newAppointment = new Appointment({
+      petId,
+      userId,
+      serviceType,
+      details,
+      date,
+      time,
+      status: status || "Booked",
+      amount: amount || 0
+    });
 
-        await newAppointment.save();
-        res.json({ message: "Appointment Added" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
+    await newAppointment.save();
+
+    // Get user's email from userId
+    const user = await User.findById(userId);
+    if (!user || !user.email) {
+      return res.status(400).json({ error: "User not found or email missing" });
     }
+
+    // Setup nodemailer
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: 'Petopia: Appointment Confirmation',
+      text: `Hi ${user.name || 'User'},\n\nYour appointment for ${serviceType} on ${date} at ${time} has been booked.\n\nThank you for choosing Petopia!`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2>Appointment Confirmation</h2>
+          <p>Hi ${user.name || 'User'},</p>
+          <p>Your appointment for <strong>${serviceType}</strong> has been successfully booked.</p>
+          <p><strong>Date:</strong> ${new Date(date).toDateString()}<br/>
+          <strong>Time:</strong> ${time}</p>
+          <p>Thank you for choosing <strong>Petopia</strong>!</p>
+        </div>
+      `
+    };
+    
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: "Appointment Added and Email Sent" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 
@@ -89,6 +129,7 @@ export const updateAppointment = async (req, res) => {
 
 
 };
+
 
 export const getPetsByUser = async (req, res) => {
     try {
@@ -172,26 +213,50 @@ export const filterAppointments = async (req, res) => {
 
 
 export const updateAppointmentStatus = async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-  
-    try {
-      const updatedAppointment = await Appointment.findByIdAndUpdate(
-        id,
-        { status },
-        { new: true }
-      );
-  
-      if (!updatedAppointment) {
-        return res.status(404).json({ message: "Appointment not found" });
-      }
-  
-      res.status(200).send({status: "Appointment updated"})
-    } catch (error) {
-      res.status(500).json({ message: "Error updating appointment", error });
-    }
-  };
+  const { id } = req.params;
+  const { status } = req.body;
 
+  try {
+    // Update appointment status
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    ).populate('userId'); // to get user info
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const user = updatedAppointment.userId;
+
+    if (user && user.email) {
+      // Setup Nodemailer
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: 'Appointment Status Update',
+        text: `Hi ${user.name || 'User'},\n\nThe status of your appointment has been updated to: ${status}.\n\nThank you,\nPetopia`
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
+
+    res.status(200).json({ status: "Appointment updated and email sent" });
+
+  } catch (error) {
+    console.error("Error updating appointment and sending email:", error);
+    res.status(500).json({ message: "Error updating appointment", error });
+  }
+};
 
   export const getUserAppointments = async (req, res) => {
   try {
@@ -262,7 +327,7 @@ export const deleteTimeSlot = async (req, res) => {
     }
 };
 
-
+//staff
 export const getAppointmentsByServiceType = async (req, res) => {
     try {
       const { serviceType } = req.params;
@@ -277,7 +342,7 @@ export const getAppointmentsByServiceType = async (req, res) => {
   
 
 
-
+//staff complete appointment
   export const completeAppointment = async (req, res) => {
     try {
       const { id } = req.params;
@@ -299,3 +364,6 @@ export const getAppointmentsByServiceType = async (req, res) => {
       res.status(500).json({ error: "Error updating appointment status" });
     }
   };
+
+
+  
