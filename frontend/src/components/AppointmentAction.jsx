@@ -30,11 +30,11 @@ function AppointmentActions({ appointmentId, currentStatus, date, time, serviceT
       }
 
       try {
-        // Step 1: Update appointment status to "Cancelled"
+        //  Update appointment status to "Cancelled"
         const cancelResponse = await axios.put(`http://localhost:5000/appointments/cancel/${appointmentId}`);
 
         if (cancelResponse.status === 200) {
-          // Step 2: Delete the associated time slot
+          //Delete the associated time slot
           const deleteResponse = await axios.post(`http://localhost:5000/appointments/timeslots/delete`, {
             date,
             time,
@@ -63,25 +63,23 @@ function AppointmentActions({ appointmentId, currentStatus, date, time, serviceT
 
   return (
     <div className="flex space-x-2">
-      {currentStatus !== "Completed" && currentStatus !== "Confirmed" && currentStatus !== "Cancelled" && (
-        <button
-          onClick={() => handleStatusChange("Confirmed")}
-          className="px-3 py-1 text-sm font-medium text-white bg-blue-500 rounded-md shadow-md transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-        >
-          Confirm
-        </button>
-      )}
-      {currentStatus !== "Completed" && currentStatus !== "Cancelled" && (
-        <button
-          onClick={() => handleCancel()}
-          className="px-3 py-1 text-sm font-medium text-white bg-red-500 rounded-md shadow-md transition-all duration-200 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
-        >
-          Cancel
-        </button>
-      )}
-    </div>
-
-
+  {currentStatus !== "Completed" && currentStatus !== "Confirmed" && currentStatus !== "Cancelled" && (
+    <button
+      onClick={() => handleStatusChange("Confirmed")}
+      className="px-2 py-1 text-xs font-medium text-white bg-blue-500 rounded shadow-sm transition-all duration-200 hover:bg-blue-300 focus:outline-none focus:ring-1 focus:ring-[#f8cd9a]"
+    >
+      Confirm
+    </button>
+  )}
+  {currentStatus !== "Completed" && currentStatus !== "Cancelled" && (
+    <button
+      onClick={() => handleCancel()}
+      className="px-2 py-1 text-xs font-medium text-white bg-red-500 rounded shadow-sm transition-all duration-200 hover:bg-red-300 focus:outline-none focus:ring-1 focus:ring-[#f8cd9a]"
+    >
+      Cancel
+    </button>
+  )}
+</div>
   );
 }
 
