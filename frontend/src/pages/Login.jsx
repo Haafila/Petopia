@@ -31,11 +31,11 @@ const Login = () => {
 
       // Redirect to dashboard
       if (role === "admin") {
-        navigate("/admin/dashboard");
+        navigate("/admin/");
       } else if (role === "customer") {
-        navigate("/customer/dashboard");
+        navigate("/customer/");
       } else if (role === "doctor") {
-        navigate("/doctor/dashboard");
+        navigate("/doctor/");
       } else {
         navigate("/");
       }

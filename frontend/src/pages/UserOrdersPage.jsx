@@ -3,11 +3,13 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 import { useConfirmDialog } from '../components/ConfirmDialog';
+import { ShoppingBag, Download, Calendar, Package, X, ChevronRight } from 'lucide-react';
 
 const UserOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedOrder, setExpandedOrder] = useState(null);
   const { openConfirmDialog } = useConfirmDialog();
 
   useEffect(() => {
@@ -36,6 +38,14 @@ const UserOrdersPage = () => {
         onConfirm: async () => {
             try {
                 await axios.put(`/api/orders/${orderId}/cancel`); 
+                
+                // Update local state to reflect the cancellation
+                setOrders(orders.map(order => 
+                  order._id === orderId 
+                    ? {...order, status: 'Cancelled'} 
+                    : order
+                ));
+                
                 toast.success('Order cancelled successfully');
             } catch (err) {
                 toast.error('Failed to cancel order. Please try again.');
@@ -70,80 +80,178 @@ const UserOrdersPage = () => {
     return format(new Date(dateString), 'MMM dd, yyyy');
   };
 
-  if (loading) return <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-                        <p className="mt-2 text-gray-600">Loading your orders...</p>
-                      </div>;
-  if (error) return <div className="text-center p-6 text-red-500">{error}</div>;
-  if (orders.length === 0) {
-    return (
-      <div className="text-center p-10">
-        <h2 className="text-2xl font-semibold mb-4">My Orders</h2>
-        <p className="text-gray-600">You don't have any orders yet.</p>
+  const toggleOrderExpansion = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Pending':
+        return 'bg-amber-100 text-amber-800 border-amber-300';
+      case 'Cancelled':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'Delivered':
+        return 'bg-green-100 text-green-800 border-green-300';
+      default:
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Cancelled':
+        return <X size={16} className="mr-1" />;
+      case 'Delivered':
+        return <Package size={16} className="mr-1" />;
+      default:
+        return <Calendar size={16} className="mr-1" />;
+    }
+  };
+
+  if (loading) return (
+    <div className="min-h-screen bg-[var(--background-light)] py-16">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[var(--main-color)] mx-auto"></div>
+          <p className="mt-4 text-[var(--dark-brown)] font-medium">Loading your orders...</p>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+
+  if (error) return (
+    <div className="min-h-screen bg-[var(--background-light)] py-16">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center p-8 bg-red-50 rounded-lg shadow-sm border border-red-200">
+          <div className="text-red-600 mb-2"><X size={32} className="mx-auto" /></div>
+          <h2 className="text-xl font-semibold text-red-700 mb-2">Something went wrong</h2>
+          <p className="text-red-600">{error}</p>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="container h-100 mx-auto px-20 py-8 mx-auto">
-      <h2 className="text-3xl font-extrabold mb-6">My Orders</h2>
-      <div className="space-y-6">
-        {orders.map((order) => (
-          <div key={order._id} className="border rounded-lg p-4 shadow-sm hover:shadow-md">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <span className="text-sm text-gray-500">Order ID: {order._id}</span>
-                <p className="font-medium">Placed on: {formatDate(order.createdAt)}</p>
-              </div>
-              <div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
-                  order.status === 'Cancelled' ? 'bg-red-100 text-red-800' : 
-                  order.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {order.status}
-                </span>
-              </div>
+    <div className="min-h-screen bg-[var(--background-light)] py-16">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-8 text-center sm:text-left">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--dark-brown)] relative inline-block">
+            My Orders
+            <div className="absolute bottom-0 left-0 w-full h-2 bg-[var(--light-brown)] opacity-40 -z-10"></div>
+          </h1>
+        </div>
+
+        {orders.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-md p-8 text-center">
+            <div className="inline-block p-4 rounded-full bg-[var(--light-grey)] mb-4">
+              <ShoppingBag size={36} className="text-[var(--dark-brown)]" />
             </div>
-            <div className="border-t pt-4 mt-4">
-              <h3 className="font-medium mb-2">Order Items</h3>
-              <ul className="space-y-2">
-                {order.products?.map((item, index) => (
-                  <li key={index} className="flex justify-between items-center">
-                    <span className="font-medium">{item.product?.name || "No Name"}</span>
-                    <span className="text-sm text-gray-500 ml-2">x{item.quantity || 0}</span>
-                    <span>
-                      LKR{" "}
-                      {item.product?.price && item.quantity
-                        ? (item.product.price * item.quantity).toFixed(2)
-                        : "0.00"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="flex justify-between items-center border-t pt-4 mt-4">
-              <p className="font-semibold text-lg">Total: LKR {order.totalAmount?.toFixed(2)}</p>
-              {order.status === 'Pending' && (
-                <button
-                  onClick={() => handleCancelOrder(order._id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Cancel Order
-                </button>
-              )}
-              {order.status === 'Delivered' && (
-                <button
-                  onClick={() => handleDownloadInvoice(order._id)}
-                  className="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700"
-                >
-                  Download Invoice
-                </button>
-              )}
-            </div>
+            <h2 className="text-xl font-semibold text-[var(--dark-brown)] mb-2">No Orders Yet</h2>
+            <p className="text-[var(--light-purple)] mb-6">You haven't placed any orders yet.</p>
+            <a href="/shop" className="inline-block px-6 py-3 bg-[var(--main-color)] text-white rounded-lg font-medium hover:bg-[#c97582] transition-colors">
+              Start Shopping
+            </a>
           </div>
-        ))}
+        ) : (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <div 
+                key={order._id} 
+                className="bg-white rounded-xl shadow-md overflow-hidden border border-[var(--light-grey)]"
+              >
+                <div 
+                  className="p-5 cursor-pointer flex justify-between items-center"
+                  onClick={() => toggleOrderExpansion(order._id)}
+                >
+                  <div className="flex items-center">
+                    <div className="bg-[var(--light-grey)] p-2 rounded-full mr-4">
+                      <ShoppingBag size={20} className="text-[var(--dark-brown)]" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-[var(--light-purple)] mb-1">
+                        {formatDate(order.createdAt)}
+                      </p>
+                      <p className="font-medium text-[var(--dark-brown)]">
+                        Order #{order._id.substring(order._id.length - 6)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center mr-3 ${getStatusColor(order.status)}`}>
+                      {getStatusIcon(order.status)}
+                      {order.status}
+                    </div>
+                    <ChevronRight 
+                      size={18} 
+                      className={`text-[var(--dark-brown)] transition-transform ${expandedOrder === order._id ? 'rotate-90' : ''}`} 
+                    />
+                  </div>
+                </div>
+
+                {expandedOrder === order._id && (
+                  <div className="border-t border-[var(--light-grey)]">
+                    <div className="p-5 bg-[var(--background-light)] bg-opacity-50">
+                      <h3 className="font-medium text-[var(--dark-brown)] mb-3">Order Items</h3>
+                      <ul className="divide-y divide-[var(--light-grey)]">
+                        {order.products?.map((item, index) => (
+                          <li key={index} className="py-3 flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="w-10 h-10 bg-[var(--light-purple)] bg-opacity-20 rounded flex items-center justify-center mr-3">
+                                <span className="text-xs font-medium text-[var(--dark-brown)]">
+                                  {item.quantity || 0}x
+                                </span>
+                              </div>
+                              <span className="font-medium text-[var(--dark-brown)]">
+                                {item.product?.name || "No Name"}
+                              </span>
+                            </div>
+                            <span className="font-medium text-[var(--dark-brown)]">
+                              LKR {item.product?.price && item.quantity
+                                ? (item.product.price * item.quantity).toFixed(2)
+                                : "0.00"}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="p-5 border-t border-[var(--light-grey)] flex justify-between items-center flex-wrap gap-4">
+                      <p className="font-bold text-lg text-[var(--dark-brown)]">
+                        Total: <span className="text-[var(--main-color)]">LKR {order.totalAmount?.toFixed(2)}</span>
+                      </p>
+                      <div className="flex gap-3">
+                        {order.status === 'Pending' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelOrder(order._id);
+                            }}
+                            className="px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center"
+                          >
+                            <X size={16} className="mr-2" />
+                            Cancel Order
+                          </button>
+                        )}
+                        {order.status === 'Delivered' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownloadInvoice(order._id);
+                            }}
+                            className="px-4 py-2 bg-[var(--main-color)] text-white rounded-lg hover:bg-[#c97582] transition-colors flex items-center"
+                          >
+                            <Download size={16} className="mr-2" />
+                            Download Invoice
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

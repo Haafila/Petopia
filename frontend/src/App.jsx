@@ -6,6 +6,12 @@ import AdminDashboardLayout from './layouts/AdminDashboardLayout';
 import CustomerDashboardLayout from './layouts/CustomerDashboardLayout';
 import DoctorDashboardLayout from './layouts/DoctorDashboardLayout';
 
+import AdminUsers from './pages/AdminUsers';
+import AdminPets from './pages/AdminPets';
+import UserPetsPage from './pages/UserPetsPage';
+import CreatePet from './pages/CreatePet';
+import EditPet from './pages/EditPet';
+
 import ProductsStorePage from './pages/ProductsShopPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import CartPage from './pages/CartPage';
@@ -18,7 +24,7 @@ import RegisterPage from './pages/Register';
 import LandingPage from './pages/LandingPage';
 import LandingLayout from './layouts/LandingLayout';
 import AdminDashboard from './pages/AdminDashboard';
-import CustomerDashboard from './pages/CustomerDashboard';
+import CustomerDashboard from './pages/CustomerDashBoard';
 import DoctorDashboard from './pages/DoctorDashboard'; 
 import UserProfilePage from './pages/UserProfilePage';
 
@@ -34,6 +40,12 @@ import Boarding from "./components/BoardingForm"
 import AppointmentList from './components/AppointmentList';
 import UserAppointments from './components/UserAppointments';
 import StaffAppointmentList from './components/StaffAppointment';
+
+import AdminAdoptions from './pages/AdminAdoptions';
+import AdoptAFriend from './pages/AdoptAFriend';
+import AdoptForm from './pages/AdoptForm';
+import MyAdoptionsPage from './pages/MyAdoptionsPage';
+import EditMyAdoptionForm from './pages/EditMyAdoptionForm';
 
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -76,19 +88,25 @@ function App() {
 
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminDashboardLayout session={session}/>}>
-        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route index element={<AdminDashboard />} />
         <Route path="profile" element={<UserProfilePage />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="pets" element={<AdminPets />} />
         <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
         <Route path="finance" element={<FinanceManagementPage />} />
         <Route path="payments" element={<AdminPayment />} />
         <Route path="AppointmentList" element ={<AppointmentList />} />
+        <Route path="adoptions" element={<AdminAdoptions />} />
       </Route>
 
       {/* Customer Routes */}
       <Route path="/customer" element={<CustomerDashboardLayout session={session}/>}>
-        <Route path="dashboard" element={<CustomerDashboard />} />
+        <Route index element={<CustomerDashboard />} />
         <Route path="profile" element={<UserProfilePage />} />
+        <Route path="pets" element={<UserPetsPage />} />
+        <Route path="pets/add" element={<CreatePet />} />
+        <Route path="pets/:id/edit" element={<EditPet />} />
         <Route path="products" element={<ProductsStorePage />} />
         <Route path="payment" element={<MakePayment />} />
         <Route path="products/cart" element={<CartPage />} />
@@ -101,11 +119,15 @@ function App() {
         <Route path="bookTraining" element={<Training />} />
         <Route path="bookBoarding" element={<Boarding />} />
         <Route path="UserAppointments" element ={<UserAppointments />} />
+        <Route path="adopt" element={<AdoptAFriend />} />
+        <Route path="adopt/adopt-form/:id" element={<AdoptForm />} />   
+        <Route path="adopt/my-adoptions" element={<MyAdoptionsPage />} />  
+        <Route path="adopt/edit-adoption/:id" element={<EditMyAdoptionForm />} />
       </Route>
 
       {/* Doctor Routes */}
       <Route path="/doctor" element={<DoctorDashboardLayout session={session}/>}>
-        <Route path="dashboard" element={<DoctorDashboard />} />
+        <Route index element={<DoctorDashboard />} />
         <Route path="profile" element={<UserProfilePage />} />
         <Route path="appointments/grooming" element={<StaffAppointmentList serviceType="Grooming" />} />
         <Route path="appointments/training" element={<StaffAppointmentList serviceType="Training" />} />

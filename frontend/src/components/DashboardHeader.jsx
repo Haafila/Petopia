@@ -1,6 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { HiOutlineBell, HiOutlineChatAlt, HiOutlineSearch } from 'react-icons/hi';
-import { Popover, Transition } from '@headlessui/react';
+import React, { useEffect, useState } from 'react';
+import { HiOutlineSearch } from 'react-icons/hi';
 
 export default function DashboardHeader() {
   const [session, setSession] = useState({ name: '', email: '' });
@@ -25,7 +24,7 @@ export default function DashboardHeader() {
     <div className='h-20 px-4 flex justify-between items-center border-b border-gray-200' style={{ backgroundColor: 'var(--background-light)' }}>
       <div className='flex items-center gap-4'>
         <div>
-          <img src="../assets/logo-no-title.png" alt="" width="30%" />
+          <img src="/assets/logo-no-title.png" alt="" width="30%" />
         </div>
         <div className='text-2xl text-gray-600 font-bold'>
           Welcome, <span className='font-black text-rose-400'>{session.name}</span>!
@@ -45,7 +44,7 @@ export default function DashboardHeader() {
         <div className='relative cursor-pointer margin-right-8'>
           <a href="/">
             <img
-              src="../assets/home.svg"
+              src="/assets/home.svg"
               alt="Back to Home"
               className="w-8 h-8"
             />
@@ -54,7 +53,7 @@ export default function DashboardHeader() {
         <div className='relative cursor-pointer margin-right-8'>
           <a href="profile">
             <img
-              src="../assets/user.png"
+              src="/assets/user.png"
               alt="User Profile"
               className="w-8 h-8"
             />

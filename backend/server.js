@@ -12,7 +12,10 @@ import appointmentRoutes from './routes/appointment.route.js';
 import timeSlotRoutes from './routes/timeslot.route.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import financeRoutes from './routes/financeRoute.js';
-import reportRoutes from './routes/report.route.js'; 
+import reportRoutes from './routes/report.route.js';
+import petRouter from './routes/pet.route.js';
+import adoptionRouter from './routes/adoption.route.js';
+import emailRoutes from './routes/email.route.js';
 
 dotenv.config();
 
@@ -26,6 +29,8 @@ app.use(
     })
 );
 
+app.use('./public', express.static('public'));
+
 app.use(express.json());
  
 app.use(session({
@@ -36,6 +41,7 @@ app.use(session({
 }));
 
 app.use("/api/users", userRoutes);
+app.use("/api/pets", petRouter);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
@@ -44,6 +50,8 @@ app.use('/api/finance', financeRoutes);
 app.use('/api/reports', reportRoutes); 
 app.use("/appointments", appointmentRoutes);
 app.use('/timeslots', timeSlotRoutes);
+app.use('/api/adoptions', adoptionRouter);
+app.use('/api/email', emailRoutes);
 
 app.listen(PORT, () => {
     connectDB();

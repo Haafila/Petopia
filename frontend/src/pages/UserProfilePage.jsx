@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaSave, FaUpload, FaTruck } from 'react-icons/fa';
+import CreatePetButton from '../components/CreatePetButton';
 
 const UserProfilePage = () => {
   const navigate = useNavigate();
@@ -214,7 +215,7 @@ const UserProfilePage = () => {
         <span className="block sm:inline">{error}</span>
         <button 
           className="mt-4 bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded"
-          onClick={() => navigate('/customer/dashboard')}
+          onClick={() => navigate('/customer/')}
         >
           Back to Dashboard
         </button>
@@ -228,7 +229,7 @@ const UserProfilePage = () => {
         <p className="text-xl">User not found</p>
         <button 
           className="mt-4 bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded"
-          onClick={() => navigate('/customer/dashboard')}
+          onClick={() => navigate('/customer/')}
         >
           Back to Dashboard
         </button>
@@ -239,8 +240,9 @@ const UserProfilePage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-lg shadow-md overflow-hidden max-w-4xl mx-auto">
-        <div className="bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-white">My Profile</h1>
+          <CreatePetButton />
         </div>
         
         {updateSuccess && (

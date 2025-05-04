@@ -90,7 +90,7 @@ const MakePayment = () => {
         await paymentService.createPayment(paymentData);
         
         toast.success("Payment processed successfully!");
-        navigate("/customer/dashboard");
+        navigate("/customer/");
       } catch (error) {
         console.error("Error creating payment:", error);
         toast.error("Failed to create payment. Please try again.");

@@ -32,7 +32,7 @@ const CustomerSideBar = () => {
         <ul className="space-y-4">
           <li>
             <Link
-                to="/customer/dashboard"
+                to="/customer/"
                 className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
             >
                 {isOpen ? <FaTachometerAlt className="mr-3" /> : <FaTachometerAlt />} {isOpen && "Dashboard"}
@@ -44,7 +44,7 @@ const CustomerSideBar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/customer/#" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
+            <Link to="/customer/pets" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "My Pets"}
             </Link>
           </li>
@@ -74,7 +74,7 @@ const CustomerSideBar = () => {
             )}
           </li>
           <li>
-            <Link to="/customer/#" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
+            <Link to="/customer/adopt" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaHeart className="mr-3" /> : <FaHeart />} {isOpen && "Adopt a Friend"}
             </Link>
           </li>

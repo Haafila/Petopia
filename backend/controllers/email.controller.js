@@ -1,6 +1,5 @@
 import { sendEmail } from "../services/email.service.js";
 
-
 // Controller to handle sending emails
 export const sendEmailController = async (req, res) => {
   try {

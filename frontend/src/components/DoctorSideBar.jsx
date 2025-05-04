@@ -32,7 +32,7 @@ const DocterSideBar = () => {
         <ul className="space-y-4">
           <li>
             <Link
-                to="/doctor/dashboard"
+                to="/doctor/"
                 className="flex items-center text-white hover:bg-rose-400 p-2 rounded block"
             >
                 {isOpen ? <FaTachometerAlt className="mr-3" /> : <FaTachometerAlt />} {isOpen && "Dashboard"}

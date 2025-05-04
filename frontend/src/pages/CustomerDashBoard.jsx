@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, PawPrint, Clock, PackageOpen, Calendar, ShoppingBag, Dog, FileText } from 'lucide-react';
+import { ShoppingCart, Clock, Calendar, ShoppingBag, Dog, FileText } from 'lucide-react';
 
 const CustomerDashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -14,7 +14,6 @@ const CustomerDashboard = () => {
         const response = await fetch('/api/orders/my-orders');
         const data = await response.json();
         
-        // Filter orders to show only pending, processing, and shipped
         const filteredOrders = data.filter(order => 
           ['Pending', 'Processing', 'Shipped'].includes(order.status)
         );
@@ -137,7 +136,7 @@ const CustomerDashboard = () => {
           <QuickLinkCard 
             icon={<Calendar className="text-blue-600" />} 
             title="Appointments" 
-            link="/customer/appointments"
+            link="/customer/UserAppointments"
             colorClass="hover:bg-blue-50"
           />
         </div>
