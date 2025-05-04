@@ -27,6 +27,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashBoard';
 import DoctorDashboard from './pages/DoctorDashboard'; 
 import UserProfilePage from './pages/UserProfilePage';
+import AboutUs from './pages/AboutUs';
 
 import AdminPayment from './components/AdminPayment';
 import MakePayment from './components/MakePayment';
@@ -82,8 +83,10 @@ function App() {
       <Route path="/" element={<LandingLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="store" element={<ProductsStorePage />} />
+        <Route path="about" element={<AboutUs />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="login" element={<Login />} />
+        <Route path="adopt" element={<AdoptAFriend />} />
       </Route>
 
       {/* Admin Routes */}

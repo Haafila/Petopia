@@ -78,7 +78,7 @@ export const sendAdoptionStatusEmail = (adoption) => {
             
             <p>For any questions or concerns, don't hesitate to contact us at <a href="mailto:support@petadoption.com">support@petadoption.com</a></p>
             <p style="margin-top: 30px; font-size: 18px;">Wishing you and ${adoption.pet.name} many happy years together!</p>
-            <img src="https://example.com/pet-happy.png" alt="Happy Pet" style="width: 200px; margin: 20px auto;">
+            <img src="https://images.unsplash.com/photo-1561438774-1790fe271b8f?q=80&w=2013&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Happy Pet" style="width: 200px; margin: 20px auto;">
           </div>
         `;
       break;

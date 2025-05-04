@@ -34,7 +34,7 @@ const AdminAdoptions = () => {
     let results = adoptions.filter(
       (adoption) =>
         adoption.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        adoption.pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (adoption.pet?.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         adoption.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         adoption.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -57,8 +57,8 @@ const AdminAdoptions = () => {
       });
       const data = await adoptionService.getAdoptions();
       setAdoptions(data);
-      // Generate report when status changes to Approved or Rejected
-      if (newStatus === "Approved" || newStatus === "Rejected") {
+      // Generate report and send email when status changes to Approved, Rejected, or Completed
+      if (["Approved", "Rejected", "Completed"].includes(newStatus)) {
         generateAdoptionReport(updatedAdoption);
         sendAdoptionStatusEmail(updatedAdoption);
       }
@@ -83,6 +83,11 @@ const AdminAdoptions = () => {
   };
 
   const generateAdoptionReport = (adoption) => {
+    if (!adoption || !adoption.pet) {
+      console.error("Invalid adoption data for report generation");
+      return;
+    }
+
     const doc = new jsPDF();
 
     // Add title
@@ -108,7 +113,7 @@ const AdminAdoptions = () => {
         ["Living Situation", adoption.livingSituation],
         ["Pet Name", adoption.pet.name],
         ["Pet Gender", adoption.pet.gender],
-        ["Pet DOB", format(new Date(adoption.pet.dob), "PPP")],
+        ["Pet DOB", adoption.pet.dob ? format(new Date(adoption.pet.dob), "PPP") : "Unknown"],
       ],
       styles: { fontSize: 10, cellPadding: 3 },
       headStyles: { fillColor: [236, 72, 153], textColor: [255, 255, 255] }, // pink-500
@@ -172,7 +177,7 @@ const AdminAdoptions = () => {
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-sm w-full md:w-auto">
+        <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-sm w-full md:w-auto overflow-x-auto">
           <button
             onClick={() => setActiveTab("all")}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
@@ -202,6 +207,16 @@ const AdminAdoptions = () => {
             }`}
           >
             Approved
+          </button>
+          <button
+            onClick={() => setActiveTab("completed")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+              activeTab === "completed"
+                ? "bg-pink-500 text-white shadow-md"
+                : "text-rose-950 hover:bg-pink-100"
+            }`}
+          >
+            Completed
           </button>
           <button
             onClick={() => setActiveTab("rejected")}
@@ -267,7 +282,7 @@ const AdminAdoptions = () => {
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex items-center">
-                        {adoption.pet.image ? (
+                        {adoption.pet && adoption.pet.image ? (
                           <div className="w-12 h-12 rounded-lg overflow-hidden shadow-sm border-2 border-pink-200">
                             <img
                               src={`http://localhost:5000${adoption.pet.image}`}
@@ -277,13 +292,15 @@ const AdminAdoptions = () => {
                           </div>
                         ) : (
                           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-bold shadow-sm">
-                            {adoption.pet.name.charAt(0).toUpperCase()}
+                            {adoption.pet && adoption.pet.name ? adoption.pet.name.charAt(0).toUpperCase() : "?"}
                           </div>
                         )}
                         <div className="ml-4">
-                          <div className="font-medium text-rose-950">{adoption.pet.name}</div>
+                          <div className="font-medium text-rose-950">
+                            {adoption.pet ? adoption.pet.name : "Unknown Pet"}
+                          </div>
                           <div className="text-sm text-pink-500 mt-1">
-                            {adoption.pet.gender}
+                            {adoption.pet ? adoption.pet.gender : "Unknown"}
                           </div>
                         </div>
                       </div>
@@ -303,6 +320,8 @@ const AdminAdoptions = () => {
                           ${
                             adoption.status === "Approved"
                               ? "bg-green-50 text-green-800 border-green-200 focus:ring-green-400"
+                              : adoption.status === "Completed"
+                              ? "bg-blue-50 text-blue-800 border-blue-200 focus:ring-blue-400"
                               : adoption.status === "Rejected"
                               ? "bg-red-50 text-red-800 border-red-200 focus:ring-red-400"
                               : "bg-pink-50 text-pink-800 border-pink-200 focus:ring-pink-400"
@@ -311,6 +330,7 @@ const AdminAdoptions = () => {
                       >
                         <option value="Pending">Pending</option>
                         <option value="Approved">Approved</option>
+                        <option value="Completed">Completed</option>
                         <option value="Rejected">Rejected</option>
                       </select>
                     </td>
@@ -335,7 +355,7 @@ const AdminAdoptions = () => {
                           </svg>
                         </button>
                         <button
-                          onClick={() => generateAdoptionReport(adoption)}
+                          onClick={() => adoption.pet && generateAdoptionReport(adoption)}
                           className="p-2 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 hover:text-pink-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-50"
                           title="Generate PDF Report"
                         >
