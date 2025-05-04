@@ -13,10 +13,10 @@ Petopia aims to provide a comprehensive platform for pet owners and pet care pro
 
 ## Technologies Used
 
-- **MongoDB**: For database management and storage of pet and user data.
-- **Express.js**: For building the backend API and handling server-side logic.
-- **React**: For creating a dynamic and responsive user interface.
-- **Node.js**: For running the server and managing backend operations.
+- **MongoDB**
+- **Express.js**
+- **React**
+- **Node.js**
 
 ## Project Goals
 
