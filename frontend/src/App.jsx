@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Login from './pages/Login';
 import AdminDashboardLayout from './layouts/AdminDashboardLayout';
 import CustomerDashboardLayout from './layouts/CustomerDashboardLayout';
+import DoctorDashboardLayout from './layouts/DoctorDashboardLayout';
 
 import ProductsStorePage from './pages/ProductsShopPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
@@ -18,7 +19,7 @@ import LandingPage from './pages/LandingPage';
 import LandingLayout from './layouts/LandingLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerDashboard from './pages/CustomerDashboard';
-
+import DoctorDashboard from './pages/DoctorDashboard'; 
 import UserProfilePage from './pages/UserProfilePage';
 
 import AdminPayment from './components/AdminPayment';
@@ -33,6 +34,8 @@ import Boarding from "./components/BoardingForm"
 import AppointmentList from './components/AppointmentList';
 import UserAppointments from './components/UserAppointments';
 import StaffAppointmentList from './components/StaffAppointment';
+
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   const [cartData] = useState([]);
@@ -100,14 +103,18 @@ function App() {
         <Route path="UserAppointments" element ={<UserAppointments />} />
       </Route>
 
-       {/* staff Routes */}
-      <Route path="/appointments/grooming" element={<StaffAppointmentList serviceType="Grooming" />} />
-      <Route path="/appointments/training" element={<StaffAppointmentList serviceType="Training" />} />
-      <Route path="/appointments/medical" element={<StaffAppointmentList serviceType="Medical" />} />
-      <Route path="/appointments/boarding" element={<StaffAppointmentList serviceType="Boarding" />} />
+      {/* Doctor Routes */}
+      <Route path="/doctor" element={<DoctorDashboardLayout session={session}/>}>
+        <Route path="dashboard" element={<DoctorDashboard />} />
+        <Route path="profile" element={<UserProfilePage />} />
+        <Route path="appointments/grooming" element={<StaffAppointmentList serviceType="Grooming" />} />
+        <Route path="appointments/training" element={<StaffAppointmentList serviceType="Training" />} />
+        <Route path="appointments/medical" element={<StaffAppointmentList serviceType="Medical" />} />
+        <Route path="appointments/boarding" element={<StaffAppointmentList serviceType="Boarding" />} />
+      </Route>
 
-
-      
+      {/* 404 Catch-all Route */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
