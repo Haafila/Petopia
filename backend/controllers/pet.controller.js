@@ -4,7 +4,7 @@ export const createPet = async (req, res) => {
   try {
     const petData = {
       ...req.body,
-      image: req.file ? `/public/uploads/${req.file.filename}` : null,
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     };
     const pet = await petService.createPet(petData);
     res.status(201).json(pet);
@@ -33,7 +33,7 @@ export const updatePet = async (req, res) => {
     if (req.file) {
       petData = {
         ...req.body,
-        image: req.file ? `/public/uploads/${req.file.filename}` : null,
+        image: req.file ? `/uploads/${req.file.filename}` : null,
       };
     }
     const pet = await petService.updatePet(req.params.id, petData);

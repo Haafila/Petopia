@@ -4,6 +4,9 @@ import { format } from "date-fns";
 import adoptionService from "../services/adoptionService";
 
 const MyAdoptionsPage = () => {
+  // Base URL for API
+  const API_BASE = "http://localhost:5000";
+
   const [adoptions, setAdoptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,49 +16,51 @@ const MyAdoptionsPage = () => {
   useEffect(() => {
     const fetchSessionAndAdoptions = async () => {
       try {
-        // First fetch user session
+        // Fetch user session
         const sessionResponse = await fetch('/api/users/session', {
           credentials: 'include',
         });
-        
-        if (!sessionResponse.ok) {
-          throw new Error('Failed to fetch session');
-        }
-        
+        if (!sessionResponse.ok) throw new Error('Failed to fetch session');
+
         const sessionData = await sessionResponse.json();
-        console.log('Session data:', sessionData);
-        
         if (!sessionData || !sessionData._id) {
-          setError("User not authenticated");
+          setError('User not authenticated');
           setLoading(false);
           return;
         }
-        
         setSession(sessionData);
-        
-        // Use the new getMyAdoptions method which automatically fetches the current user's adoptions
+
+        // Fetch user's adoptions
         const userAdoptions = await adoptionService.getMyAdoptions();
-        setAdoptions(userAdoptions);
+        // Prepend API_BASE to pet images
+        const withImageUrls = userAdoptions.map(adoption => ({
+          ...adoption,
+          petImageUrl: adoption.pet?.image
+            ? `${API_BASE}${adoption.pet.image}`
+            : null,
+        }));
+
+        setAdoptions(withImageUrls);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch your adoptions");
-        setLoading(false);
         console.error(err);
+        setError('Failed to fetch your adoptions');
+        setLoading(false);
       }
     };
 
     fetchSessionAndAdoptions();
-  }, []);
+  }, [navigate]);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this adoption request?")) {
-      try {
-        await adoptionService.deleteAdoption(id);
-        setAdoptions(adoptions.filter((adoption) => adoption._id !== id));
-      } catch (err) {
-        console.error(err);
-        alert("Failed to delete adoption request");
-      }
+    if (!window.confirm('Are you sure you want to delete this adoption request?')) return;
+
+    try {
+      await adoptionService.deleteAdoption(id);
+      setAdoptions(prev => prev.filter(adoption => adoption._id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete adoption request');
     }
   };
 
@@ -66,13 +71,13 @@ const MyAdoptionsPage = () => {
       </div>
     </div>
   );
-  
+
   if (error) return (
     <div className="p-6 bg-rose-100 text-rose-800 rounded-lg max-w-md mx-auto mt-8 text-center">
       {error}
     </div>
   );
-  
+
   if (!session || !session._id) return (
     <div className="p-6 bg-rose-100 text-rose-800 rounded-lg max-w-md mx-auto mt-8 text-center">
       Please login to view your adoptions
@@ -86,7 +91,7 @@ const MyAdoptionsPage = () => {
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-600">
             My Adoption Requests
           </h2>
-          <button 
+          <button
             onClick={() => navigate('/customer/adopt')}
             className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors duration-300 shadow-md hover:shadow-lg"
           >
@@ -125,25 +130,20 @@ const MyAdoptionsPage = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-pink-100">
                   {adoptions.map((adoption) => {
-                    // Safely access nested properties
                     const petName = adoption.pet?.name || 'Unknown Pet';
                     const petInitial = petName.charAt(0);
-                    const petGender = adoption.pet?.gender ? adoption.pet.gender.toLowerCase() : 'unknown';
-                    const petImage = adoption.pet?.image;
-                    const livingSituation = adoption.livingSituation ? adoption.livingSituation.toLowerCase() : 'not specified';
+                    const petGender = adoption.pet?.gender?.toLowerCase() || 'unknown';
+                    const livingSituation = adoption.livingSituation?.toLowerCase() || 'not specified';
                     const status = adoption.status || 'Pending';
-                    const isPending = status === "Pending";
+                    const isPending = status === 'Pending';
 
                     return (
-                      <tr
-                        key={adoption._id}
-                        className="hover:bg-pink-50 transition-colors duration-150"
-                      >
+                      <tr key={adoption._id} className="hover:bg-pink-50 transition-colors duration-150">
                         <td className="py-4 px-6 whitespace-nowrap">
                           <div className="flex items-center">
-                            {petImage ? (
+                            {adoption.petImageUrl ? (
                               <img
-                                src={`http://localhost:5001${petImage}`}
+                                src={adoption.petImageUrl}
                                 alt={petName}
                                 className="w-12 h-12 rounded-full object-cover border-2 border-pink-200"
                               />

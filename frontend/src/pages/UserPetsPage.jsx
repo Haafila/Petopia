@@ -5,6 +5,8 @@ import { getPetsByOwner, deletePet } from "../services/petService";
 import LoadingPage from "./LoadingPage";
 
 const UserPetsPage = () => {
+  const API_BASE = "http://localhost:5000";
+
   const [pets, setPets] = useState([]);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,44 +14,37 @@ const UserPetsPage = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch session data when component mounts
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch('/api/users/session', {
-          credentials: 'include',
+        const response = await fetch("/api/users/session", {
+          credentials: "include",
         });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch session');
-        }
-        
+        if (!response.ok) throw new Error("Failed to fetch session");
         const data = await response.json();
-        console.log('Session data:', data);
         setSession(data);
-        
-        // Once we have the session, fetch the user's pets
-        if (data && data._id) {
-          fetchUserPets(data._id);
-        }
+        if (data._id) fetchUserPets(data._id);
       } catch (err) {
-        console.error('Error fetching session:', err);
-        setError('Please log in to view your pets');
+        setError("Please log in to view your pets");
         setLoading(false);
-        setTimeout(() => navigate('/login'), 2000);
+        setTimeout(() => navigate("/login"), 2000);
       }
     };
-    
     fetchSession();
   }, [navigate]);
 
   const fetchUserPets = async (userId) => {
     try {
       const userPets = await getPetsByOwner(userId);
-      setPets(userPets);
+      const petsWithUrls = userPets.map((pet) => ({
+        ...pet,
+        imageUrl: pet.image
+          ? `${API_BASE}${pet.image}`
+          : `https://via.placeholder.com/150?text=No+Image`,
+      }));
+      setPets(petsWithUrls);
     } catch (err) {
-      console.error('Error fetching pets:', err);
-      setError('Failed to load pets. Please try again later.');
+      setError("Failed to load pets. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +58,7 @@ const UserPetsPage = () => {
     try {
       setLoading(true);
       await deletePet(petId);
-      // Remove the deleted pet from the state
+      // Remove the deleted pet
       setPets(pets.filter(pet => pet._id !== petId));
       setDeleteConfirm(null);
       setError({ type: 'success', message: 'Pet deleted successfully!' });
@@ -199,7 +194,7 @@ const UserPetsPage = () => {
                 <div className="h-48 bg-pink-100 relative">
                   {pet.image ? (
                     <img
-                      src={pet.image}
+                      src={pet.imageUrl}
                       alt={pet.name}
                       className="w-full h-full object-cover"
                     />

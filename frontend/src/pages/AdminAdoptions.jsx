@@ -270,7 +270,7 @@ const AdminAdoptions = () => {
                         {adoption.pet.image ? (
                           <div className="w-12 h-12 rounded-lg overflow-hidden shadow-sm border-2 border-pink-200">
                             <img
-                              src={`http://localhost:5001${adoption.pet.image}`}
+                              src={`http://localhost:5000${adoption.pet.image}`}
                               alt={adoption.pet.name}
                               className="w-full h-full object-cover"
                             />

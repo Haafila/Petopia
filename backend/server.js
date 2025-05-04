@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
 import { connectDB } from './config/db.js';
+import path from "path";
+import { fileURLToPath } from "url";
 
 import productRoutes from './routes/product.route.js';
 import orderRoutes from './routes/order.route.js';
@@ -29,7 +31,10 @@ app.use(
     })
 );
 
-app.use('./public', express.static('public'));
+app.use(
+    "/uploads",
+    express.static(path.join(path.dirname(fileURLToPath(import.meta.url)), "./public/uploads"))
+);
 
 app.use(express.json());
  

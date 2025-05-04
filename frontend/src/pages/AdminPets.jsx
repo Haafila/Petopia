@@ -371,7 +371,7 @@ const AdminPets = () => {
                       {pet.image ? (
                         <div className="relative w-10 h-10 mr-3">
                           <img
-                            src={`http://localhost:5001${pet.image}`}
+                            src={`http://localhost:5000${pet.image}`}
                             alt={pet?.name}
                             className="rounded-full object-cover w-10 h-10 border-2 border-pink-200"
                           />
@@ -386,7 +386,6 @@ const AdminPets = () => {
                       )}
                       <div>
                         <div className="font-medium text-rose-950">{pet?.name}</div>
-                        <div className="text-xs text-gray-500">{pet.type || "Unknown breed"}</div>
                       </div>
                     </div>
                   </td>

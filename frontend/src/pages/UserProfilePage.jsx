@@ -90,7 +90,8 @@ const UserProfilePage = () => {
         });
         
         if (userData.image) {
-          setImagePreview(userData.image);
+          const url = `http://localhost:5000${userData.image}`;
+          setImagePreview(url);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -106,7 +107,7 @@ const UserProfilePage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Check if this is a nested property (for delivery details)
+    // Check if this is nested
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData({
@@ -257,7 +258,7 @@ const UserProfilePage = () => {
               <div className="relative w-48 h-48 mb-4">
                 {imagePreview ? (
                   <img
-                    src={imagePreview.startsWith('data:') ? imagePreview : imagePreview}
+                    src={imagePreview}
                     alt={user.name}
                     className="w-full h-full object-cover rounded-full border-4 border-pink-200"
                   />

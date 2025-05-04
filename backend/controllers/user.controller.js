@@ -5,7 +5,7 @@ export const createUser = async (req, res) => {
   try {
     const userData = {
       ...req.body,
-      image: req.file ? `/public/uploads/${req.file.filename}` : null,
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     };
     const user = await userService.createUser(userData);
     res.status(201).json(user);
@@ -22,7 +22,7 @@ export const updateUser = async (req, res) => {
     if (req.file) {
       userData = {
         ...req.body,
-        image: req.file ? `/public/uploads/${req.file.filename}` : null,
+        image: req.file ? `/uploads/${req.file.filename}` : null,
       };
     }
     const user = await userService.updateUser(req.params.id, userData);

@@ -246,7 +246,7 @@ const AdminUsers = () => {
                         {user.image ? (
                           <div className="w-10 h-10 rounded-full overflow-hidden mr-3 shadow-sm border-2 border-pink-200">
                             <img
-                              src={`http://localhost:5001${user.image}`}
+                              src={user.image ? `http://localhost:5000${user.image}` : `https://via.placeholder.com/150?text=No+Image`}
                               alt={user.name}
                               className="w-full h-full object-cover"
                             />
