@@ -12,14 +12,14 @@ function Grooming() {
   const [time, setTime] = useState("");
   const [bookedSlots, setBookedSlots] = useState([]);
   const [session, setSession] = useState({ _id: '', email: '' });
-  const [amount, setAmount] = useState(0); // State for service amount
-
+  const [amount, setAmount] = useState(0); 
   // Service pricing configuration
   const servicePrices = {
     "Bathing": 30,
     "Haircut": 45,
     "Nail Trimming": 20,
     "Full Grooming Package": 75 
+  };
 
   const timeSlots = [
     "09:00 AM-09:30 AM", "09:30 AM-10:00 AM", "10:00 AM-10:30 AM", "10:30 AM-11:00 AM",
@@ -91,7 +91,7 @@ function Grooming() {
           details, 
           date, 
           time,
-          amount // Include amount in the appointment
+          amount 
         };
 
         axios.post("http://localhost:5000/appointments/add", newAppointment)
@@ -102,6 +102,15 @@ function Grooming() {
             setDate("");
             setTime("");
             setAmount(0);
+            navigate("/customer/appointmentSuccess", {
+              state: {
+                serviceType, 
+                date,
+                time,
+                groomingType,
+                amount
+              }
+            });
           })
           .catch(err => {
             alert("Failed to book appointment.");
