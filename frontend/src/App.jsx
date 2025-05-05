@@ -32,6 +32,7 @@ import AboutUs from './pages/AboutUs';
 import AdminPayment from './components/AdminPayment';
 import MakePayment from './components/MakePayment';
 import FinanceManagementPage from './pages/FinanceManagementPage';
+import PaymentSuccess from './components/PaymentSuccess';
 
 import ServiceType from "./components/ServiceTypes"
 import Grooming from "./components/GroomingForm"
@@ -112,6 +113,7 @@ function App() {
         <Route path="pets/:id/edit" element={<EditPet />} />
         <Route path="products" element={<ProductsStorePage />} />
         <Route path="payment" element={<MakePayment />} />
+        <Route path="payment-success" element={<PaymentSuccess />} />
         <Route path="products/cart" element={<CartPage />} />
         <Route path="products/:id" element={<ProductDetailsPage />} />
         <Route path="products/checkout" element={<CheckoutPage cartItems={cartData} />} />
