@@ -11,7 +11,7 @@ function StaffAppointmentList({ serviceType }) {
         const response = await axios.get(
           `http://localhost:5000/appointments/${serviceType}`
         );
-        // 👉 Filter appointments where status is Confirmed or Completed
+        // Filter only Confirmed or Completed appointments
         const filteredAppointments = response.data.filter(
           (appt) => appt.status === "Confirmed" || appt.status === "Completed"
         );
@@ -74,22 +74,22 @@ function StaffAppointmentList({ serviceType }) {
             <tbody>
               {appointments.map((appointment) => (
                 <tr key={appointment._id} className="border-t border-[#ccc4ba] hover:bg-[#fef9ea]">
-                  {serviceType === "Boarding" ? (
+                  {serviceType === "Boarding" && appointment.details?.boardingDetails ? (
                     <>
                       <td className="px-4 py-3 text-[#3d1e24]">
-                        {appointment.details.boardingDetails.startDate.split("T")[0]}
+                        {appointment.details.boardingDetails.startDate?.split("T")[0] || "N/A"}
                       </td>
                       <td className="px-4 py-3 text-[#3d1e24]">
-                        {appointment.details.boardingDetails.endDate.split("T")[0]}
+                        {appointment.details.boardingDetails.endDate?.split("T")[0] || "N/A"}
                       </td>
                     </>
                   ) : (
                     <>
                       <td className="px-4 py-3 text-[#3d1e24]">
-                        {appointment.date.split("T")[0]}
+                        {appointment.date?.split("T")[0] || "N/A"}
                       </td>
                       <td className="px-4 py-3 text-[#3d1e24]">
-                        {appointment.time}
+                        {appointment.time || "N/A"}
                       </td>
                     </>
                   )}

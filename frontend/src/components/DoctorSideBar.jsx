@@ -11,6 +11,8 @@ const DocterSideBar = () => {
   const toggleNavbar = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
+  
+
   return (
     <div className="flex h-screen">
       <div className={`p-5 space-y-6 transition-all duration-400 ${isOpen ? "w-65" : "w-18"}`} style={{ backgroundColor: "var(--dark-brown)" }}>
@@ -56,22 +58,22 @@ const DocterSideBar = () => {
             {isDropdownOpen && (
               <ul className="ml-6 mt-2 space-y-2 transition-all duration-300">
                 <li>
-                  <Link to="/appointments/grooming" className="block text-white hover:bg-rose-400 p-2 rounded">
+                  <Link to="/doctor/appointments/grooming" className="block text-white hover:bg-rose-400 p-2 rounded">
                     Grooming
                   </Link>
                 </li>
                 <li>
-                  <Link to="/appointments/training" className="block text-white hover:bg-rose-400 p-2 rounded">
+                  <Link to="/doctor/appointments/training" className="block text-white hover:bg-rose-400 p-2 rounded">
                     Training
                   </Link>
                 </li>
                 <li>
-                  <Link to="/appointments/medical" className="block text-white hover:bg-rose-400 p-2 rounded">
+                  <Link to="/doctor/appointments/medical" className="block text-white hover:bg-rose-400 p-2 rounded">
                     Medical
                   </Link>
                 </li>
                 <li>
-                  <Link to="/appointments/boarding" className="block text-white hover:bg-rose-400 p-2 rounded">
+                  <Link to="/doctor/appointments/boarding" className="block text-white hover:bg-rose-400 p-2 rounded">
                     Boarding
                   </Link>
                 </li>
