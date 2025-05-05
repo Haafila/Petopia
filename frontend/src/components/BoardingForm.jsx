@@ -102,6 +102,14 @@ function Boarding() {
         setStartDate("");
         setEndDate("");
         setAmount(0);
+        navigate("/customer/appointmentSuccess", {
+          state: {
+            serviceType, 
+            startDate,
+            endDate,
+            amount
+          }
+        });
       })
       .catch(err => {
         alert("Failed to book boarding appointment.");
