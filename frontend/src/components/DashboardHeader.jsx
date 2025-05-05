@@ -27,7 +27,7 @@ export default function DashboardHeader() {
           <img src="/assets/logo-no-title.png" alt="" width="30%" />
         </div>
         <div className='text-2xl text-gray-600 font-bold'>
-          Welcome, <span className='font-black text-rose-400'>{session.name}</span>!
+          Welcome, <span className='font-black text-rose-400'>{session?.name || 'Guest'}</span>!
         </div>
       </div>
 

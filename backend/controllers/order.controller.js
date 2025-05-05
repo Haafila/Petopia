@@ -455,7 +455,7 @@ export async function downloadInvoice(req, res) {
   }
 }
 
-// Ensure mongoose is connected
+// is mongoose connected ?
 const checkMongooseConnection = () => {
   if (mongoose.connection.readyState !== 1) {
     console.warn('Warning: Mongoose connection is not ready. Current state:', mongoose.connection.readyState);
@@ -546,7 +546,7 @@ export const getDirectBuyData = async (req, res) => {
   try {
     checkMongooseConnection();
     
-    // Detailed logging for debugging
+    // for debugging
     console.log("Session object in getDirectBuyData:", req.session ? "exists" : "undefined");
     
     if (!req.session) {

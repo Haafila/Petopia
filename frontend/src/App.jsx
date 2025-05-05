@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
+import { SessionProvider } from './context/SessionContext';
+import { CartProvider } from './context/CartContext';
 import Login from './pages/Login';
 import AdminDashboardLayout from './layouts/AdminDashboardLayout';
 import CustomerDashboardLayout from './layouts/CustomerDashboardLayout';
@@ -79,70 +81,72 @@ function App() {
   }
 
   return (
-    <Routes>
-      {/* Landing Layout Routes */}
-      <Route path="/" element={<LandingLayout />}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="store" element={<ProductsStorePage />} />
-        <Route path="about" element={<AboutUs />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="login" element={<Login />} />
-        <Route path="adopt" element={<AdoptAFriend />} />
-      </Route>
+    <SessionProvider>
+      <Routes>
+        {/* Landing Layout Routes */}
+        <Route path="/" element={<LandingLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="store" element={<ProductsStorePage />} />
+          <Route path="about" element={<AboutUs />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="login" element={<Login />} />
+          <Route path="adopt" element={<AdoptAFriend />} />
+        </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminDashboardLayout session={session}/>}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="profile" element={<UserProfilePage />} />
-        <Route path="users" element={<AdminUsers />} />
-        <Route path="pets" element={<AdminPets />} />
-        <Route path="products" element={<ProductManagementPage />} />
-        <Route path="orders" element={<OrderManagementPage />} />
-        <Route path="finance" element={<FinanceManagementPage />} />
-        <Route path="payments" element={<AdminPayment />} />
-        <Route path="AppointmentList" element ={<AppointmentList />} />
-        <Route path="adoptions" element={<AdminAdoptions />} />
-      </Route>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminDashboardLayout session={session}/>}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="profile" element={<UserProfilePage />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="pets" element={<AdminPets />} />
+          <Route path="products" element={<ProductManagementPage />} />
+          <Route path="orders" element={<OrderManagementPage />} />
+          <Route path="finance" element={<FinanceManagementPage />} />
+          <Route path="payments" element={<AdminPayment />} />
+          <Route path="AppointmentList" element ={<AppointmentList />} />
+          <Route path="adoptions" element={<AdminAdoptions />} />
+        </Route>
 
-      {/* Customer Routes */}
-      <Route path="/customer" element={<CustomerDashboardLayout session={session}/>}>
-        <Route index element={<CustomerDashboard />} />
-        <Route path="profile" element={<UserProfilePage />} />
-        <Route path="pets" element={<UserPetsPage />} />
-        <Route path="pets/add" element={<CreatePet />} />
-        <Route path="pets/:id/edit" element={<EditPet />} />
-        <Route path="products" element={<ProductsStorePage />} />
-        <Route path="payment" element={<MakePayment />} />
-        <Route path="payment-success" element={<PaymentSuccess />} />
-        <Route path="products/cart" element={<CartPage />} />
-        <Route path="products/:id" element={<ProductDetailsPage />} />
-        <Route path="checkout" element={<CheckoutPage cartItems={cartData} />} />
-        <Route path="orders" element={<UserOrdersPage />} />
-        <Route path="ServiceType" element={<ServiceType />} />
-        <Route path="bookGrooming" element={<Grooming />} />
-        <Route path="bookMedical" element={<Medical />} />
-        <Route path="bookTraining" element={<Training />} />
-        <Route path="bookBoarding" element={<Boarding />} />
-        <Route path="UserAppointments" element ={<UserAppointments />} />
-        <Route path="adopt" element={<AdoptAFriend />} />
-        <Route path="adopt/adopt-form/:id" element={<AdoptForm />} />   
-        <Route path="adopt/my-adoptions" element={<MyAdoptionsPage />} />  
-        <Route path="adopt/edit-adoption/:id" element={<EditMyAdoptionForm />} />
-      </Route>
+        {/* Customer Routes */}
+        <Route path="/customer" element={<CartProvider><CustomerDashboardLayout session={session}/></CartProvider>}>
+          <Route index element={<CustomerDashboard />} />
+          <Route path="profile" element={<UserProfilePage />} />
+          <Route path="pets" element={<UserPetsPage />} />
+          <Route path="pets/add" element={<CreatePet />} />
+          <Route path="pets/:id/edit" element={<EditPet />} />
+          <Route path="products" element={<ProductsStorePage />} />
+          <Route path="payment" element={<MakePayment />} />
+          <Route path="payment-success" element={<PaymentSuccess />} />
+          <Route path="products/cart" element={<CartPage />} />
+          <Route path="products/:id" element={<ProductDetailsPage />} />
+          <Route path="checkout" element={<CheckoutPage cartItems={cartData} />} />
+          <Route path="orders" element={<UserOrdersPage />} />
+          <Route path="ServiceType" element={<ServiceType />} />
+          <Route path="bookGrooming" element={<Grooming />} />
+          <Route path="bookMedical" element={<Medical />} />
+          <Route path="bookTraining" element={<Training />} />
+          <Route path="bookBoarding" element={<Boarding />} />
+          <Route path="UserAppointments" element ={<UserAppointments />} />
+          <Route path="adopt" element={<AdoptAFriend />} />
+          <Route path="adopt/adopt-form/:id" element={<AdoptForm />} />   
+          <Route path="adopt/my-adoptions" element={<MyAdoptionsPage />} />  
+          <Route path="adopt/edit-adoption/:id" element={<EditMyAdoptionForm />} />
+        </Route>
 
-      {/* Doctor Routes */}
-      <Route path="/doctor" element={<DoctorDashboardLayout session={session}/>}>
-        <Route index element={<DoctorDashboard />} />
-        <Route path="profile" element={<UserProfilePage />} />
-        <Route path="appointments/grooming" element={<StaffAppointmentList serviceType="Grooming" />} />
-        <Route path="appointments/training" element={<StaffAppointmentList serviceType="Training" />} />
-        <Route path="appointments/medical" element={<StaffAppointmentList serviceType="Medical" />} />
-        <Route path="appointments/boarding" element={<StaffAppointmentList serviceType="Boarding" />} />
-      </Route>
+        {/* Doctor Routes */}
+        <Route path="/doctor" element={<DoctorDashboardLayout session={session}/>}>
+          <Route index element={<DoctorDashboard />} />
+          <Route path="profile" element={<UserProfilePage />} />
+          <Route path="appointments/grooming" element={<StaffAppointmentList serviceType="Grooming" />} />
+          <Route path="appointments/training" element={<StaffAppointmentList serviceType="Training" />} />
+          <Route path="appointments/medical" element={<StaffAppointmentList serviceType="Medical" />} />
+          <Route path="appointments/boarding" element={<StaffAppointmentList serviceType="Boarding" />} />
+        </Route>
 
-      {/* 404 Catch-all Route */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        {/* 404 Catch-all Route */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </SessionProvider>
   );
 }
 

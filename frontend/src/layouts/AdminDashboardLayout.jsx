@@ -10,6 +10,7 @@ const AdminDashboardLayout = ({ session }) => {
     toast.warn('You are not authorized to access this page. Please login first.');
     return <Navigate to="/login" />;
   }
+  
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: 'var(--background-light)' }}>
       <DashboardHeader />
