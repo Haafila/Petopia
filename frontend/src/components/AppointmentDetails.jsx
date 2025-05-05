@@ -177,7 +177,7 @@ function AppointmentDetails({ appointment, onClose }) {
                   </>
                 )}
                 
-                {(status === 'Booked' || status === 'Confirmed') && (
+                {(status === 'Booked') && (
                     <CancelAppointmentButton
                       appointmentId={appointment._id}
                       date={appointment.date}
