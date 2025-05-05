@@ -103,6 +103,17 @@ function Medical() {
             setDate("");
             setTime("");
             setAmount(0);
+            navigate("/customer/appointmentSuccess", {
+              state: {
+                amount,
+                serviceType,
+                medicalServiceType,
+                date,
+                time
+              }
+            });
+            
+            
           })
           .catch(err => {
             alert("Failed to book appointment.");
