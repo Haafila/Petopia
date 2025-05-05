@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer'; 
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -453,3 +454,201 @@ export async function downloadInvoice(req, res) {
     res.status(500).json({ message: 'Could not generate invoice' });
   }
 }
+
+// Ensure mongoose is connected
+const checkMongooseConnection = () => {
+  if (mongoose.connection.readyState !== 1) {
+    console.warn('Warning: Mongoose connection is not ready. Current state:', mongoose.connection.readyState);
+  }
+};
+
+// Direct buy functionality
+export const directBuy = async (req, res) => {
+  try {
+    checkMongooseConnection();
+    
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ success: false, message: "User not logged in" });
+    }
+
+    const { productId, quantity } = req.body;
+    
+    if (!productId || !quantity || quantity <= 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Product ID and quantity are required" 
+      });
+    }
+
+    // Find the product
+    const Product = mongoose.model('Product'); 
+    const product = await Product.findById(productId);
+    
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    
+    // Check if there's enough stock
+    if (product.quantity < quantity) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Insufficient stock. Only ${product.quantity} available.` 
+      });
+    }
+
+    // Calculate total amount
+    const totalAmount = parseFloat((quantity * product.price).toFixed(2));
+    
+    // Create temporary cart data for checkout page
+    const directBuyData = {
+      items: [{
+        product: {
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          imageUrl: product.imageUrl
+        },
+        quantity: parseInt(quantity)
+      }],
+      totalAmount: totalAmount
+    };
+
+    // Make sure session is initialized properly
+    if (!req.session) {
+      console.error("Session object is undefined");
+      return res.status(500).json({ success: false, message: "Session not initialized" });
+    }
+    
+    // Store in session for use in checkout page
+    req.session.directBuyData = directBuyData;
+    
+    // To ensure data is saved in session before redirecting
+    req.session.save((err) => {
+      if (err) {
+        console.error("Error saving session:", err);
+        return res.status(500).json({ success: false, message: "Error saving to session" });
+      }
+      
+      res.status(200).json({ 
+        success: true, 
+        message: "Product ready for checkout", 
+        directBuyData 
+      });
+    });
+  } catch (error) {
+    console.error("Error in direct buy:", error.message);
+    res.status(500).json({ success: false, message: "Server Error: " + error.message });
+  }
+};
+
+// Get direct buy data from session
+export const getDirectBuyData = async (req, res) => {
+  try {
+    checkMongooseConnection();
+    
+    // Detailed logging for debugging
+    console.log("Session object in getDirectBuyData:", req.session ? "exists" : "undefined");
+    
+    if (!req.session) {
+      return res.status(500).json({ success: false, message: "Session not initialized" });
+    }
+    
+    if (!req.session.user) {
+      return res.status(401).json({ success: false, message: "User not logged in" });
+    }
+    
+    console.log("Direct buy data in session:", req.session.directBuyData ? "exists" : "undefined");
+    
+    if (!req.session.directBuyData) {
+      return res.status(404).json({ success: false, message: "No direct buy data found" });
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      directBuyData: req.session.directBuyData 
+    });
+  } catch (error) {
+    console.error("Error fetching direct buy data:", error.message, error.stack);
+    res.status(500).json({ success: false, message: "Server Error: " + error.message });
+  }
+};
+
+// Process direct buy order
+export const processDirectBuyOrder = async (req, res) => {
+  try {
+    checkMongooseConnection();
+    
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ success: false, message: "User not logged in" });
+    }
+
+    if (!req.session.directBuyData) {
+      return res.status(400).json({ success: false, message: "No direct buy data found" });
+    }
+
+    if (!req.body.paymentMethod || !req.body.deliveryDetails) {
+      return res.status(400).json({ success: false, message: "Missing payment method or delivery details" });
+    }
+
+    const { directBuyData } = req.session;
+    const Product = mongoose.model('Product');
+    const product = await Product.findById(directBuyData.items[0].product._id);
+    
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    
+    if (product.quantity < directBuyData.items[0].quantity) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Insufficient stock for ${product.name}` 
+      });
+    }
+    
+    // Set paymentStatus based on payment method
+    const paymentMethod = req.body.paymentMethod;
+    const paymentStatus = paymentMethod === 'Card' ? 'Pending' : 'Pending';
+
+    // Create new order
+    const newOrder = new Order({
+      user: req.session.user._id,
+      products: [{
+        product: product._id,
+        quantity: directBuyData.items[0].quantity
+      }],
+      totalAmount: directBuyData.totalAmount,
+      paymentMethod: paymentMethod,
+      paymentStatus: paymentStatus,
+      status: 'Pending',
+      deliveryDetails: req.body.deliveryDetails,
+    });
+
+    await newOrder.save();
+    
+    // Update product quantity
+    product.quantity -= directBuyData.items[0].quantity;
+    await product.save();
+    
+    // Only clear direct buy data if not using card payment
+    // For card payment, we'll keep it until payment is confirmed
+    if (paymentMethod !== 'Card') {
+      delete req.session.directBuyData;
+      
+      // Save session changes
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session after clearing directBuyData:", err);
+        }
+      });
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Order placed successfully!", 
+      data: newOrder 
+    });
+  } catch (error) {
+    console.error("Error processing direct buy order:", error.message, error.stack);
+    res.status(500).json({ success: false, message: "Server Error: " + error.message });
+  }
+};

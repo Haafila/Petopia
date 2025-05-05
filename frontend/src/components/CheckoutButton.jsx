@@ -12,7 +12,7 @@ const CheckoutButton = () => {
         alert('Your cart is empty. Add items before checking out.');
         return;
         }
-        navigate('/customer/products/checkout');
+        navigate('/customer/checkout');
     };
 
     return (

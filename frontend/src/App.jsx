@@ -116,7 +116,7 @@ function App() {
         <Route path="payment-success" element={<PaymentSuccess />} />
         <Route path="products/cart" element={<CartPage />} />
         <Route path="products/:id" element={<ProductDetailsPage />} />
-        <Route path="products/checkout" element={<CheckoutPage cartItems={cartData} />} />
+        <Route path="checkout" element={<CheckoutPage cartItems={cartData} />} />
         <Route path="orders" element={<UserOrdersPage />} />
         <Route path="ServiceType" element={<ServiceType />} />
         <Route path="bookGrooming" element={<Grooming />} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -7,8 +7,13 @@ import { useOutletContext } from 'react-router-dom';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session } = useOutletContext();
   const { cart, cartTotal, clearCart } = useCart();
+  const [isDirectBuy, setIsDirectBuy] = useState(false);
+  const [directBuyData, setDirectBuyData] = useState(null);
+  const [directBuyTotal, setDirectBuyTotal] = useState(0);
+  
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -21,17 +26,62 @@ const CheckoutPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingUserData, setIsLoadingUserData] = useState(false);
   const [userDetailsLoaded, setUserDetailsLoaded] = useState(false);
+  const [isLoadingDirectBuy, setIsLoadingDirectBuy] = useState(false);
 
-  // Fetch user data 
+  // Direct buy checkout?
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const isDirect = queryParams.get('direct') === 'true';
+    setIsDirectBuy(isDirect);
+    
+    if (isDirect) {
+      fetchDirectBuyData();
+    }
+  }, [location.search]);
+
+  // Fetch direct buy data if needed
+  const fetchDirectBuyData = async () => {
+    try {
+      setIsLoadingDirectBuy(true);
+      const response = await axios.get('/api/orders/direct-buy-data');
+      if (response.data.success) {
+        setDirectBuyData(response.data.directBuyData);
+        setDirectBuyTotal(response.data.directBuyData.totalAmount);
+      } else {
+        toast.error('Failed to load product details');
+        navigate('/customer/products');
+      }
+    } catch (error) {
+      console.error('Error fetching direct buy data:', error);
+      toast.error('Something went wrong. Redirecting to products.');
+      navigate('/customer/products');
+    } finally {
+      setIsLoadingDirectBuy(false);
+    }
+  };
+
+  // Fetch user data for both checkout types
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!session || !session._id || userDetailsLoaded) return; 
+      // Only proceed if session exists and details haven't been loaded yet
+      if (!session || !session._id) {
+        console.log('No session available for fetching user data');
+        return;
+      }
+      
+      if (userDetailsLoaded) {
+        console.log('User details already loaded, skipping fetch');
+        return;
+      }
   
       try {
         setIsLoadingUserData(true);
+        console.log('Fetching user data for delivery details...');
+        
         const response = await axios.get(`/api/users/${session._id}`);
         const userData = response.data;
   
+        // Populate form with user's saved delivery details or fallback to user profile data
         if (userData.deliveryDetails && Object.keys(userData.deliveryDetails).length > 0) {
           setFormData({
             name: userData.deliveryDetails.name || userData.name || '',
@@ -41,10 +91,9 @@ const CheckoutPage = () => {
             phone: userData.deliveryDetails.phone || userData.phone || '',
           });
           
-          if (!userDetailsLoaded) { 
-            toast.info('Your saved delivery details have been loaded', { autoClose: 2000 });
-          }
+          toast.info('Your saved delivery details have been loaded', { autoClose: 2000 });
         } else {
+          // Fallback to basic user profile data
           setFormData({
             name: userData.name || '',
             address: userData.address || '',
@@ -52,19 +101,33 @@ const CheckoutPage = () => {
             postalCode: '',
             phone: userData.phone || '',
           });
+          
+          if (userData.name || userData.address || userData.phone) {
+            toast.info('Some basic profile information was loaded', { autoClose: 2000 });
+          }
         }
         setUserDetailsLoaded(true);
       } catch (error) {
         console.error('Error fetching user data:', error);
+        toast.error('Could not load your saved delivery details');
       } finally {
         setIsLoadingUserData(false);
       }
     };
   
+    // Trigger fetch user data when session is available, regardless of checkout type
     fetchUserData();
-  }, [session, userDetailsLoaded]); 
+  }, [session]); 
   
-
+  // Secondary effect for loading details when direct buy data is loaded
+  useEffect(() => {
+    // This ensures delivery details are loaded for direct buy after product data is retrieved
+    if (isDirectBuy && directBuyData && !userDetailsLoaded && session) {
+      console.log('Direct buy data loaded, ensuring delivery details are populated');
+      setUserDetailsLoaded(false); // Reset flag to trigger data fetch
+    }
+  }, [isDirectBuy, directBuyData, userDetailsLoaded, session]);
+  
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Full Name is required';
@@ -87,36 +150,63 @@ const CheckoutPage = () => {
     if (!validateForm()) return;
     
     const sessionUser = session;
-    const orderData = {
-      user: sessionUser._id,
-      products: (cart?.items || []).map(item => ({
-        product: item.product._id,
-        quantity: item.quantity
-      })),
-      totalAmount: cartTotal,
-      paymentMethod: paymentMethod === 'Card' ? 'Card' : 'Cash on Delivery', 
-      paymentStatus: paymentMethod === 'Card' ? 'Paid' : 'Pending',
-      status: 'Pending',
-      deliveryDetails: { ...formData }
-    };
-  
+    
     try {
       setIsSubmitting(true);
-      const response = await axios.post('/api/orders/place-order', orderData);
-  
-      if (paymentMethod === 'Card') {
-        navigate(`/customer/payment?serviceType=Order&amount=${cartTotal}&userName=${formData.name}`, { 
-          state: { 
-            serviceType: 'Order', 
-            amount: cartTotal, 
-            userName: formData.name,
-            orderData: response.data.data 
-          }
-        });
+      
+      if (isDirectBuy) {
+        // Process direct buy order
+        const directBuyOrderData = {
+          paymentMethod: paymentMethod === 'Card' ? 'Card' : 'Cash on Delivery',
+          deliveryDetails: { ...formData }
+        };
+        
+        const response = await axios.post('/api/orders/process-direct-buy', directBuyOrderData);
+        
+        if (paymentMethod === 'Card') {
+          navigate(`/customer/payment?serviceType=Order&amount=${directBuyTotal}&userName=${formData.name}`, { 
+            state: { 
+              serviceType: 'Order', 
+              amount: directBuyTotal, 
+              userName: formData.name,
+              orderData: response.data.data 
+            }
+          });
+        } else {
+          toast.success('Order placed successfully!');
+          navigate('/customer/products');
+        }
       } else {
-        await clearCart();
-        toast.success('Order placed successfully!');
-        navigate('/customer/products');
+        // Process regular cart order
+        const orderData = {
+          user: sessionUser._id,
+          products: (cart?.items || []).map(item => ({
+            product: item.product._id,
+            quantity: item.quantity
+          })),
+          totalAmount: cartTotal,
+          paymentMethod: paymentMethod === 'Card' ? 'Card' : 'Cash on Delivery', 
+          paymentStatus: paymentMethod === 'Card' ? 'Paid' : 'Pending',
+          status: 'Pending',
+          deliveryDetails: { ...formData }
+        };
+      
+        const response = await axios.post('/api/orders/place-order', orderData);
+      
+        if (paymentMethod === 'Card') {
+          navigate(`/customer/payment?serviceType=Order&amount=${cartTotal}&userName=${formData.name}`, { 
+            state: { 
+              serviceType: 'Order', 
+              amount: cartTotal, 
+              userName: formData.name,
+              orderData: response.data.data 
+            }
+          });
+        } else {
+          await clearCart();
+          toast.success('Order placed successfully!');
+          navigate('/customer/products');
+        }
       }
     } catch (error) {
       toast.warn(`Failed to place order: ${error.response?.data?.message || error.message}`);
@@ -158,17 +248,32 @@ const CheckoutPage = () => {
       console.error('Error saving delivery details:', error);
     }
   };
+
+  // Check if cart is empty and not direct buy
+  const isCartEmpty = !isDirectBuy && (!cart || cart.items?.length === 0);
+  
+  // Determine if loading
+  const isLoading = (isDirectBuy && isLoadingDirectBuy) || isLoadingUserData;
+  
+  // Get items and total based on checkout type
+  const items = isDirectBuy ? (directBuyData?.items || []) : (cart?.items || []);
+  const total = isDirectBuy ? directBuyTotal : cartTotal;
   
   return (
     <div className="container h-100 mx-auto px-4 py-8 max-w-2xl bg-[var(--background-light)] p-6">
-      <h2 className="text-2xl font-extrabold mb-4 text-[var(--dark-brown)]">Checkout</h2>
-      {!cart || cart.items?.length === 0 ? (
+      <h2 className="text-2xl font-extrabold mb-4 text-[var(--dark-brown)]">
+        {isDirectBuy ? 'Express Checkout' : 'Checkout'}
+      </h2>
+      
+      {isLoading ? (
+        <p className="text-center py-4">Loading checkout details...</p>
+      ) : isCartEmpty ? (
         <p className="text-red-500">Your cart is empty. <a href="/customer/products" className="text-[var(--main-color)] underline">Go to shop</a></p>
       ) : (
         <>
           <h3 className="text-xl font-semibold text-[var(--dark-brown)]">Order Summary</h3>
           <ul className="border rounded p-4 mb-4 bg-[var(--light-grey)]">
-            {cart.items.map(item => (
+            {items.map(item => (
               <li key={item.product._id} className="flex justify-between py-2 border-b">
                 <span>{item.product.name} x {item.quantity}</span>
                 <span>LKR {(item.product.price * item.quantity).toFixed(2)}</span>
@@ -176,7 +281,7 @@ const CheckoutPage = () => {
             ))}
             <li className="font-semibold flex justify-between mt-2">
               <span>Total:</span>
-              <span>LKR {cartTotal.toFixed(2)}</span>
+              <span>LKR {total.toFixed(2)}</span>
             </li>
           </ul>
 
@@ -195,7 +300,7 @@ const CheckoutPage = () => {
             
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
-              <input type="text" id="name"name="name" value={formData.name} placeholder="Recipient's full name" className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
+              <input type="text" id="name" name="name" value={formData.name} placeholder="Recipient's full name" className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
               {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
             </div>
             

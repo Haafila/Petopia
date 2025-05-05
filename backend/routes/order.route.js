@@ -1,8 +1,13 @@
 import express from "express";
-import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder, downloadInvoice } from "../controllers/order.controller.js";
+import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder, downloadInvoice, directBuy, getDirectBuyData, processDirectBuyOrder } from "../controllers/order.controller.js";
 import sessionAuth from "../middleware/auth.session.js";
 
 const router = express.Router();
+
+// Direct buy routes
+router.post('/direct-buy', sessionAuth, directBuy);
+router.get('/direct-buy-data', sessionAuth, getDirectBuyData);
+router.post('/process-direct-buy', sessionAuth, processDirectBuyOrder);
 
 // Customer Routes
 router.post("/place-order", sessionAuth, placeOrder);
@@ -17,6 +22,5 @@ router.put("/:id", updateOrder);
 router.delete("/:id", deleteOrder);
 router.patch("/:orderId/status", updateOrderStatus);
 router.patch("/:orderId/payment-status", updatePaymentStatus);
-
 
 export default router;
