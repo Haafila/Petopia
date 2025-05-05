@@ -19,8 +19,7 @@ function Grooming() {
     "Bathing": 30,
     "Haircut": 45,
     "Nail Trimming": 20,
-    "Full Grooming Package": 75 // Added example of a package
-  };
+    "Full Grooming Package": 75 
 
   const timeSlots = [
     "09:00 AM-09:30 AM", "09:30 AM-10:00 AM", "10:00 AM-10:30 AM", "10:30 AM-11:00 AM",
