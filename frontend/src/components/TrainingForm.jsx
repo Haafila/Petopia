@@ -103,6 +103,15 @@ function Training() {
             setDate("");
             setTime("");
             setAmount(0);
+            navigate("/customer/appointmentSuccess", {
+              state: {
+                serviceType, 
+                date,
+                time,
+                trainingType,
+                amount
+              }
+            });
           })
           .catch(err => {
             alert("Failed to book appointment.");
