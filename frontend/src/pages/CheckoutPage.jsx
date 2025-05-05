@@ -10,17 +10,12 @@ const CheckoutPage = () => {
   const location = useLocation();
   const { session } = useOutletContext();
   const { cart, cartTotal, clearCart } = useCart();
+  
+  // State management
   const [isDirectBuy, setIsDirectBuy] = useState(false);
   const [directBuyData, setDirectBuyData] = useState(null);
   const [directBuyTotal, setDirectBuyTotal] = useState(0);
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    phone: '',
-  });
+  const [formData, setFormData] = useState({ name: '', address: '', city: '', postalCode: '', phone: '' });
   const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,15 +23,11 @@ const CheckoutPage = () => {
   const [userDetailsLoaded, setUserDetailsLoaded] = useState(false);
   const [isLoadingDirectBuy, setIsLoadingDirectBuy] = useState(false);
 
-  // Direct buy checkout?
+  // Check for direct buy from URL params
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const isDirect = queryParams.get('direct') === 'true';
+    const isDirect = new URLSearchParams(location.search).get('direct') === 'true';
     setIsDirectBuy(isDirect);
-    
-    if (isDirect) {
-      fetchDirectBuyData();
-    }
+    if (isDirect) fetchDirectBuyData();
   }, [location.search]);
 
   // Fetch direct buy data if needed
@@ -60,28 +51,17 @@ const CheckoutPage = () => {
     }
   };
 
-  // Fetch user data for both checkout types
+  // Load user delivery details
   useEffect(() => {
     const fetchUserData = async () => {
-      // Only proceed if session exists and details haven't been loaded yet
-      if (!session || !session._id) {
-        console.log('No session available for fetching user data');
-        return;
-      }
+      if (!session?._id || userDetailsLoaded) return;
       
-      if (userDetailsLoaded) {
-        console.log('User details already loaded, skipping fetch');
-        return;
-      }
-  
       try {
         setIsLoadingUserData(true);
-        console.log('Fetching user data for delivery details...');
-        
         const response = await axios.get(`/api/users/${session._id}`);
         const userData = response.data;
   
-        // Populate form with user's saved delivery details or fallback to user profile data
+        // Populate form with user's saved delivery details or profile data
         if (userData.deliveryDetails && Object.keys(userData.deliveryDetails).length > 0) {
           setFormData({
             name: userData.deliveryDetails.name || userData.name || '',
@@ -90,10 +70,8 @@ const CheckoutPage = () => {
             postalCode: userData.deliveryDetails.postalCode || '',
             phone: userData.deliveryDetails.phone || userData.phone || '',
           });
-          
           toast.info('Your saved delivery details have been loaded', { autoClose: 2000 });
         } else {
-          // Fallback to basic user profile data
           setFormData({
             name: userData.name || '',
             address: userData.address || '',
@@ -115,19 +93,17 @@ const CheckoutPage = () => {
       }
     };
   
-    // Trigger fetch user data when session is available, regardless of checkout type
     fetchUserData();
   }, [session]); 
   
   // Secondary effect for loading details when direct buy data is loaded
   useEffect(() => {
-    // This ensures delivery details are loaded for direct buy after product data is retrieved
     if (isDirectBuy && directBuyData && !userDetailsLoaded && session) {
-      console.log('Direct buy data loaded, ensuring delivery details are populated');
       setUserDetailsLoaded(false); // Reset flag to trigger data fetch
     }
   }, [isDirectBuy, directBuyData, userDetailsLoaded, session]);
   
+  // Form validation
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Full Name is required';
@@ -141,15 +117,12 @@ const CheckoutPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  // Submit order
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
-    const sessionUser = session;
     
     try {
       setIsSubmitting(true);
@@ -179,7 +152,7 @@ const CheckoutPage = () => {
       } else {
         // Process regular cart order
         const orderData = {
-          user: sessionUser._id,
+          user: session._id,
           products: (cart?.items || []).map(item => ({
             product: item.product._id,
             quantity: item.quantity
@@ -215,14 +188,13 @@ const CheckoutPage = () => {
     }
   };
 
-  // Save current delivery details to user profile
+  // Save delivery details to user profile
   const saveDeliveryDetails = async () => {
-    if (!session || !session._id) {
+    if (!session?._id) {
       toast.error('You must be logged in to save delivery details');
       return;
     }
 
-    // Before saving
     if (!formData.name || !formData.address || !formData.city || !formData.postalCode || !formData.phone) {
       toast.warn('Please fill in all delivery details before saving');
       return;
@@ -237,9 +209,7 @@ const CheckoutPage = () => {
       formPayload.append('deliveryDetails.phone', formData.phone);
       
       await axios.put(`/api/users/${session._id}`, formPayload, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       
       toast.success('Delivery details saved to your profile');
@@ -249,101 +219,139 @@ const CheckoutPage = () => {
     }
   };
 
-  // Check if cart is empty and not direct buy
+  // Helper variables
   const isCartEmpty = !isDirectBuy && (!cart || cart.items?.length === 0);
-  
-  // Determine if loading
   const isLoading = (isDirectBuy && isLoadingDirectBuy) || isLoadingUserData;
-  
-  // Get items and total based on checkout type
   const items = isDirectBuy ? (directBuyData?.items || []) : (cart?.items || []);
   const total = isDirectBuy ? directBuyTotal : cartTotal;
   
+  // Styling constants
+  const inputStyle = "w-full p-3 rounded bg-[var(--white)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition-all";
+  const errorStyle = "text-red-500 text-sm mt-1";
+  const sectionTitle = "text-lg font-semibold text-[var(--dark-brown)]";
+  const buttonBase = "px-4 py-2 rounded shadow-md hover:shadow-lg transition-all";
+  const activeButton = `${buttonBase} bg-[var(--puppy-brown)] text-white`;
+  const inactiveButton = `${buttonBase} bg-[var(--light-grey)] hover:bg-[var(--grey)]`;
+  
   return (
-    <div className="container h-100 mx-auto px-4 py-8 max-w-2xl bg-[var(--background-light)] p-6">
-      <h2 className="text-2xl font-extrabold mb-4 text-[var(--dark-brown)]">
+    <div className="container mx-auto py-8 px-6 bg-[var(--background-light)]">
+      <h2 className="text-3xl font-extrabold mb-6 text-[var(--dark-brown)] text-center">
         {isDirectBuy ? 'Express Checkout' : 'Checkout'}
       </h2>
       
       {isLoading ? (
         <p className="text-center py-4">Loading checkout details...</p>
       ) : isCartEmpty ? (
-        <p className="text-red-500">Your cart is empty. <a href="/customer/products" className="text-[var(--main-color)] underline">Go to shop</a></p>
+        <p className="text-red-500 text-center">Your cart is empty. <a href="/customer/products" className="text-[var(--main-color)] underline">Go to shop</a></p>
       ) : (
-        <>
-          <h3 className="text-xl font-semibold text-[var(--dark-brown)]">Order Summary</h3>
-          <ul className="border rounded p-4 mb-4 bg-[var(--light-grey)]">
-            {items.map(item => (
-              <li key={item.product._id} className="flex justify-between py-2 border-b">
-                <span>{item.product.name} x {item.quantity}</span>
-                <span>LKR {(item.product.price * item.quantity).toFixed(2)}</span>
-              </li>
-            ))}
-            <li className="font-semibold flex justify-between mt-2">
-              <span>Total:</span>
-              <span>LKR {total.toFixed(2)}</span>
-            </li>
-          </ul>
+        <div className="flex flex-col md:flex-row gap-6 max-w-6xl mx-auto">
+          {/* Order Summary */}
+          <div className="md:w-1/3">
+            <div className="bg-stone-600 border-3 border-stone-300 rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-white mb-4 pb-2 border-b border-[var(--light-grey)]">
+                Order Summary
+              </h3>
+              <ul className="space-y-3">
+                {items.map(item => (
+                  <li key={item.product._id} className="flex justify-between py-2">
+                    <div>
+                      <p className="font-medium text-white">{item.product.name}</p>
+                      <p className="text-sm text-gray-50">Qty: {item.quantity}</p>
+                    </div>
+                    <span className="font-medium text-white">LKR {(item.product.price * item.quantity).toFixed(2)}</span>
+                  </li>
+                ))}
+                <li className="border-t border-[var(--light-grey)] pt-3 mt-3">
+                  <div className="flex justify-between font-bold text-lg text-white">
+                    <span>Total:</span>
+                    <span>LKR {total.toFixed(2)}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-[var(--dark-brown)]">Delivery Details</h3>
-              {isLoadingUserData && (
-                <span className="text-sm text-gray-500">Loading saved details...</span>
-              )}
-              {userDetailsLoaded && session && (
-                <button type="button" onClick={saveDeliveryDetails} className="text-sm bg-[var(--puppy-brown)] text-white px-3 py-1 rounded hover:bg-[var(--dark-brown)]">
-                  Save for future orders
+          {/* Checkout Form */}
+          <div className="md:w-2/3">
+            <div className="bg-white border-3 border-stone-200 rounded-lg shadow-lg p-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className={`${sectionTitle} text-xl`}>Delivery Details</h3>
+                  {isLoadingUserData && <span className="text-sm text-gray-500">Loading saved details...</span>}
+                  {userDetailsLoaded && session && (
+                    <button 
+                      type="button" 
+                      onClick={saveDeliveryDetails} 
+                      className="text-sm bg-[var(--puppy-brown)] text-white px-4 py-2 rounded shadow-md hover:shadow-lg transition-all">
+                      Save for future orders
+                    </button>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-[var(--dark-brown)] mb-1">Full Name</label>
+                    <input type="text" id="name" name="name" value={formData.name} placeholder="Recipient's full name" className={inputStyle} onChange={handleChange} required />
+                    {errors.name && <p className={errorStyle}>{errors.name}</p>}
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-[var(--dark-brown)] mb-1">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value={formData.phone} placeholder="10-digit phone number" className={inputStyle} onChange={handleChange} required />
+                    {errors.phone && <p className={errorStyle}>{errors.phone}</p>}
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-[var(--dark-brown)] mb-1">Delivery Address</label>
+                  <input type="text" id="address" name="address" value={formData.address} placeholder="Street address, apartment, etc." className={inputStyle} onChange={handleChange} required />
+                  {errors.address && <p className={errorStyle}>{errors.address}</p>}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="city" className="block text-sm font-medium text-[var(--dark-brown)] mb-1">City</label>
+                    <input type="text" id="city" name="city" value={formData.city} placeholder="City" className={inputStyle} onChange={handleChange} required />
+                    {errors.city && <p className={errorStyle}>{errors.city}</p>}
+                  </div>
+
+                  <div>
+                    <label htmlFor="postalCode" className="block text-sm font-medium text-[var(--dark-brown)] mb-1">Postal Code</label>
+                    <input type="text" id="postalCode" name="postalCode" value={formData.postalCode} placeholder="5-digit postal code" className={inputStyle} onChange={handleChange} required />
+                    {errors.postalCode && <p className={errorStyle}>{errors.postalCode}</p>}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h3 className={`${sectionTitle} mb-2`}>Payment Method</h3>
+                  <div className="flex gap-4">
+                    <button 
+                      type="button" 
+                      onClick={() => setPaymentMethod('Cash on Delivery')}
+                      className={paymentMethod === 'Cash on Delivery' ? activeButton : inactiveButton}>
+                      Cash on Delivery
+                    </button>
+                    
+                    <button 
+                      type="button" 
+                      onClick={() => setPaymentMethod('Card')}
+                      className={paymentMethod === 'Card' ? activeButton : inactiveButton}>
+                      Online Payment
+                    </button>
+                  </div>
+                  {errors.paymentMethod && <p className={errorStyle}>{errors.paymentMethod}</p>}
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={!paymentMethod || isSubmitting} 
+                  className="w-full bg-[var(--main-color)] text-white py-3 mt-4 rounded shadow-md hover:shadow-lg transition-all hover:bg-[var(--light-purple)] disabled:bg-[var(--grey)]">
+                  {isSubmitting ? 'Placing Order...' : 'Place Order'}
                 </button>
-              )}
+              </form>
             </div>
-            
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
-              <input type="text" id="name" name="name" value={formData.name} placeholder="Recipient's full name" className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-            </div>
-            
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">Delivery Address</label>
-              <input type="text" id="address" name="address" value={formData.address} placeholder="Street address, apartment, etc." className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
-              {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
-            </div>
-            
-            <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
-              <input type="text" id="city" name="city" value={formData.city} placeholder="City" className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
-              {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Postal Code</label>
-              <input type="text" id="postalCode" name="postalCode" value={formData.postalCode} placeholder="5-digit postal code" className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
-              {errors.postalCode && <p className="text-red-500 text-sm">{errors.postalCode}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-              <input type="tel" id="phone" name="phone" value={formData.phone} placeholder="10-digit phone number" className="w-full p-2 border rounded bg-[var(--white)]" onChange={handleChange} required />
-              {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
-            </div>
-
-            <h3 className="text-lg font-semibold text-[var(--dark-brown)]">Payment Method</h3>
-            <div className="flex gap-4">
-              <button type="button" onClick={() => setPaymentMethod('Cash on Delivery')}
-                className={`px-4 py-2 rounded ${paymentMethod === 'Cash on Delivery' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Cash on Delivery</button>
-              
-              <button type="button" onClick={() => setPaymentMethod('Card')}
-                className={`px-4 py-2 rounded ${paymentMethod === 'Card' ? 'bg-[var(--puppy-brown)] text-white' : 'bg-[var(--light-grey)] hover:bg-[var(--grey)]'}`}>Online Payment</button>
-            </div>
-            {errors.paymentMethod && <p className="text-red-500 text-sm">{errors.paymentMethod}</p>}
-
-            <button type="submit" disabled={!paymentMethod || isSubmitting} 
-              className="w-full bg-[var(--main-color)] text-white py-3 rounded hover:bg-[var(--light-purple)] disabled:bg-[var(--grey)]">
-              {isSubmitting ? 'Placing Order...' : 'Place Order'}
-            </button>
-          </form>
-        </>
+          </div>
+        </div>
       )}
     </div>
   );

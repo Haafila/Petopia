@@ -1,8 +1,8 @@
 import PDFDocument from 'pdfkit';
-import ExcelJS     from 'exceljs';
-import fs          from 'fs';
-import path        from 'path';
-import Order       from '../models/order.model.js';
+import ExcelJS from 'exceljs';
+import fs from 'fs';
+import path from 'path';
+import Order from '../models/order.model.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -209,11 +209,11 @@ function generatePDFReport(data, type, options, res) {
   
   // Define theme colors
   const colors = {
-    primary: '#F5C3C2',    // Light pink
-    secondary: '#E0E0E0',  // Light gray
-    accent: '#D3A4A4',     // Darker pink
-    text: '#333333',       // Dark gray for text
-    border: '#CCCCCC'      // Light gray for borders
+    primary: '#F5C3C2',    
+    secondary: '#E0E0E0',  
+    accent: '#D3A4A4',     
+    text: '#333333',       
+    border: '#CCCCCC'      
   };
   
   // Add page background
