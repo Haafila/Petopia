@@ -142,7 +142,7 @@ export const getPetsByUser = async (req, res) => {
         return res.status(404).json({ error: "User not found" });
       }
   
-      const pets = await Pet.find({ ownerId: userId });
+      const pets = await Pet.find({ owner: userId });
       return res.status(200).json(pets);
     } catch (error) {
       
