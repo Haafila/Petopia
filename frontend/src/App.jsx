@@ -44,6 +44,7 @@ import Boarding from "./components/BoardingForm"
 import AppointmentList from './components/AppointmentList';
 import UserAppointments from './components/UserAppointments';
 import StaffAppointmentList from './components/StaffAppointment';
+import AppointmentSuccess from "./components/AppointmentSuccess";
 
 import AdminAdoptions from './pages/AdminAdoptions';
 import AdoptAFriend from './pages/AdoptAFriend';
@@ -127,6 +128,7 @@ function App() {
           <Route path="bookTraining" element={<Training />} />
           <Route path="bookBoarding" element={<Boarding />} />
           <Route path="UserAppointments" element ={<UserAppointments />} />
+          <Route path="appointmentSuccess" element={<AppointmentSuccess />} />
           <Route path="adopt" element={<AdoptAFriend />} />
           <Route path="adopt/adopt-form/:id" element={<AdoptForm />} />   
           <Route path="adopt/my-adoptions" element={<MyAdoptionsPage />} />  
