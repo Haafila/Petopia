@@ -16,10 +16,10 @@ function Medical() {
 
   // Service pricing configuration
   const servicePrices = {
-    "Vaccination": 40,
-    "Routine Check-up": 60,
-    "Emergency": 120,
-    "Dental Check": 75
+    "Vaccination": 4000,
+    "Routine Check-up": 6000,
+    "Emergency": 5000,
+    "Dental Check": 7500
   };
 
   const timeSlots = [
@@ -97,7 +97,7 @@ function Medical() {
 
         axios.post("http://localhost:5000/appointments/add", newAppointment)
           .then(() => {
-            alert(`Medical Appointment Booked Successfully! Total: $${amount.toFixed(2)}`);
+            alert(`Medical Appointment Booked Successfully! Total: LKR${amount.toFixed(2)}`);
             setPetId("");
             setMedicalServiceType("");
             setDate("");
@@ -173,7 +173,7 @@ function Medical() {
               <option value="">--Select Medical Service--</option>
               {Object.entries(servicePrices).map(([service, price]) => (
                 <option key={service} value={service}>
-                  {service} (${price.toFixed(2)})
+                  {service} (LKR{price.toFixed(2)})
                 </option>
               ))}
             </select>
@@ -185,7 +185,7 @@ function Medical() {
               Selected Service: <span className="font-bold">{medicalServiceType || "None selected"}</span>
             </p>
             <p className="text-[var(--dark-brown)] font-medium">
-              Total Amount: <span className="font-bold">${amount.toFixed(2)}</span>
+              Total Amount: <span className="font-bold">LKR{amount.toFixed(2)}</span>
             </p>
           </div>
 
@@ -235,7 +235,7 @@ function Medical() {
                 ? "bg-gray-400 cursor-not-allowed" 
                 : "bg-[var(--main-color)] hover:bg-[var(--puppy-brown)] text-white"}`}
           >
-            {amount > 0 ? `Book Appointment ($${amount.toFixed(2)})` : "Book Appointment"}
+            {amount > 0 ? `Book Appointment (LKR${amount.toFixed(2)})` : "Book Appointment"}
           </button>
         </form>
       </div>
