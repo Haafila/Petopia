@@ -453,7 +453,7 @@ const OrderManagementPage = () => {
 
             {/* Pagination */}
             {filteredOrders.length > itemsPerPage && (
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center mt-8 py-4">
                     <ReactPaginate
                         previousLabel={"← Previous"}
                         nextLabel={"Next →"}
@@ -463,11 +463,13 @@ const OrderManagementPage = () => {
                         pageRangeDisplayed={2}
                         onPageChange={handlePageClick}
                         containerClassName={"pagination flex gap-2"}
-                        pageClassName={"px-4 py-2 border rounded bg-pink-300 hover:bg-gray-300"}
-                        activeClassName={"bg-rose-300 text-white"}
-                        previousClassName={"px-4 py-2 border rounded bg-white hover:bg-gray-300"}
-                        nextClassName={"px-4 py-2 border rounded bg-white hover:bg-gray-300"}
+                        pageClassName={"px-4 py-2 rounded bg-pink-300 hover:bg-gray-300"}
+                        activeClassName={"bg-rose-400 text-white"}
+                        previousClassName={"px-4 py-2 rounded bg-white hover:bg-gray-300"}
+                        nextClassName={"px-4 py-2 rounded bg-white hover:bg-gray-300"}
                         disabledClassName={"opacity-50 cursor-not-allowed"}
+                    
+                        className="flex flex-wrap gap-2 justify-center items-center"
                     />
                 </div>
             )}

@@ -8,11 +8,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 
+// Reference: https://github.com/foliojs/pdfkit/blob/master/docs/getting_started.md
+// Reference: https://www.npmjs.com/package/exceljs/v/1.8.0
+
 export async function generateReport(req, res) {
     try {
         const { type, format, filters, options } = req.body;
     
-        // Build query based on filters
+        // Build query 
         let query = {};
         
         if (filters.orderStatus) {
@@ -36,7 +39,7 @@ export async function generateReport(req, res) {
           }
         }
     
-        // Fetch data from database 
+        // Fetch data
         let data;
         try {
           switch (type) {
@@ -57,7 +60,7 @@ export async function generateReport(req, res) {
           return res.status(500).json({ message: 'Error fetching data for report' });
         }
     
-        // Generate report in the requested format
+        // Generate report
         try {
           switch (format) {
             case 'pdf':
@@ -111,8 +114,8 @@ async function fetchRevenueData(query) {
   try {
     const orders = await Order.find({
       ...query,
-      status: { $nin: ['Cancelled'] }, // Exclude cancelled orders
-      paymentStatus: 'Paid' // Include only paid orders
+      status: { $nin: ['Cancelled'] }, // - cancelled orders
+      paymentStatus: 'Paid' // + only paid orders
     }).lean();
 
     // Group by date and calculate revenue
@@ -151,7 +154,7 @@ async function fetchProductSalesData(query) {
   try {
     const orders = await Order.find({
       ...query,
-      status: { $nin: ['Cancelled'] } // Exclude cancelled orders
+      status: { $nin: ['Cancelled'] } // - cancelled orders
     }).populate('products.product', 'name price').lean();
 
     // Group by product and calculate sales
@@ -175,14 +178,13 @@ async function fetchProductSalesData(query) {
           };
         }
         
-        // Make sure quantity is a number
         const quantity = parseInt(item.quantity) || 0;
         productSales[productId].quantitySold += quantity;
         productSales[productId].totalRevenue += (item.product.price * quantity) || 0;
       });
     });
 
-    // Format numbers for display
+    // Format numbers 
     Object.values(productSales).forEach(product => {
       product.unitPrice = product.unitPrice.toFixed(2);
       product.totalRevenue = product.totalRevenue.toFixed(2);
@@ -204,7 +206,7 @@ function generatePDFReport(data, type, options, res) {
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename=${type}-report.pdf`);
   
-  // Pipe the PDF to the response
+  // Pipe PDF to the response
   doc.pipe(res);
   
   // Define theme colors
@@ -242,20 +244,17 @@ function generatePDFReport(data, type, options, res) {
   
   doc.fillColor(colors.text)
      .fontSize(24)
-     // Changed from Helvetica-Bold to just default bold font
      .font('Courier-Bold')
      .text(titles[type] || 'Report', 50, 50, { align: 'right', width: 500 });
   
   // Add date
   doc.fontSize(12)
-     // Changed from Helvetica to just default font
      .font('Courier')
      .text(`Generated on: ${new Date().toLocaleDateString()}`, 50, 80, { align: 'right', width: 500 });
   
-  // Add custom message if provided
+  // Add custom message 
   if (options.customMessage) {
     doc.fontSize(12)
-       // Changed from Helvetica-Italic to just default oblique font
        .font('Courier-Oblique')
        .text(options.customMessage, 50, 100, { align: 'right', width: 500 });
   }
@@ -363,7 +362,7 @@ function addOrdersPDFContent(doc, orders, colors) {
     
     y += 20;
     
-    // horizontal line after each row
+    // horizontal line 
     doc.strokeColor(colors.border)
        .lineWidth(0.5)
        .moveTo(50, y - 5)

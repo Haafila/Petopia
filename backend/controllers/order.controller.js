@@ -24,6 +24,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// for debugging
 console.log('SMTP config:', {
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
@@ -33,40 +34,129 @@ console.log('SMTP config:', {
 // Send cancellation email
 const sendOrderCancellationEmail = async (order, user) => {
   try {
+    // Generate order ID (to display)
+    const displayOrderId = order._id.toString().substring(order._id.toString().length - 8);
+    
+    // Format date
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: user.email,
-      subject: `Order Cancellation - Order #${order._id.toString().substring(order._id.toString().length - 8)}`,
+      subject: `Your Petopia Order #${displayOrderId} Has Been Cancelled`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #e91e63;">Order Cancellation Notice</h2>
-          <p>Dear ${user.name},</p>
-          <p>We're writing to inform you that your order <strong>#${order._id.toString().substring(order._id.toString().length - 8)}</strong> has been cancelled.</p>
-          
-          <h3>Order Summary:</h3>
-          <ul>
-            <li>Order ID: ${order._id.toString()}</li>
-            <li>Total Amount: LKR ${order.totalAmount.toFixed(2)}</li>
-            <li>Payment Method: ${order.paymentMethod}</li>
-          </ul>
-          
-          <p>If you have any questions or concerns about this cancellation, please contact our customer service team.</p>
-          
-          <p>Thank you for your understanding.</p>
-          
-          <p>Best regards,<br>Petopia Team</p>
-        </div>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Order Cancellation</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; line-height: 1.6;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            <!-- Header -->
+            <tr>
+              <td style="background-color: #7b4397; background-image: linear-gradient(to right, #7b4397, #dc2430); padding: 30px 0; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 600;">Petopia</h1>
+                <p style="color: #ffffff; margin: 5px 0 0; font-size: 16px;">We Love Your Pets As Much As You Do</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 40px 30px; background-color: #ffffff;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td style="padding: 0 0 20px 0;">
+                      <h2 style="margin: 0 0 10px 0; font-size: 22px; color: #dc2430;">Order Cancellation Notice</h2>
+                      <p style="margin: 0; font-size: 16px;">Dear ${user.name},</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 0 20px 0;">
+                      <p style="margin: 0; font-size: 16px;">We're writing to inform you that your order <strong>#${displayOrderId}</strong> has been cancelled as requested.</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 0 20px 0;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f8f8f8; border-radius: 6px; padding: 20px; border-left: 4px solid #dc2430;">
+                        <tr>
+                          <td>
+                            <h3 style="margin: 0 0 12px 0; font-size: 18px; color: #333;">Order Summary</h3>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                              <tr>
+                                <td width="40%" style="padding: 5px 0; font-size: 15px; color: #666;">Order ID:</td>
+                                <td style="padding: 5px 0; font-size: 15px;"><strong>#${displayOrderId}</strong></td>
+                              </tr>
+                              <tr>
+                                <td width="40%" style="padding: 5px 0; font-size: 15px; color: #666;">Order Date:</td>
+                                <td style="padding: 5px 0; font-size: 15px;">${order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : currentDate}</td>
+                              </tr>
+                              <tr>
+                                <td width="40%" style="padding: 5px 0; font-size: 15px; color: #666;">Total Amount:</td>
+                                <td style="padding: 5px 0; font-size: 15px;"><strong>LKR ${order.totalAmount.toFixed(2)}</strong></td>
+                              </tr>
+                              <tr>
+                                <td width="40%" style="padding: 5px 0; font-size: 15px; color: #666;">Payment Method:</td>
+                                <td style="padding: 5px 0; font-size: 15px;">${order.paymentMethod}</td>
+                              </tr>
+                              <tr>
+                                <td width="40%" style="padding: 5px 0; font-size: 15px; color: #666;">Cancellation Date:</td>
+                                <td style="padding: 5px 0; font-size: 15px;">${currentDate}</td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 0 20px 0;">
+                      <p style="margin: 0 0 15px 0; font-size: 16px;">If you have any questions or concerns regarding this cancellation, please don't hesitate to reach out to our customer service team:</p>
+                      <div style="background-color: #f8f8f8; border-radius: 6px; padding: 12px; text-align: center; margin-bottom: 15px;">
+                        <a href="mailto:support@petopia.com" style="color: #7b4397; text-decoration: none; font-weight: bold;">support@petopia.com</a> | <a href="tel:+94123456789" style="color: #7b4397; text-decoration: none; font-weight: bold;">+94 123 456 789</a>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px 0 0 0; border-top: 1px solid #f0f0f0;">
+                      <p style="margin: 0 0 5px 0; font-size: 16px;">Thank you for your understanding.</p>
+                      <p style="margin: 0; font-size: 16px;">Best regards,</p>
+                      <p style="margin: 0; font-size: 16px; font-weight: bold; color: #7b4397;">The Petopia Team</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            
+            <tr>
+              <td style="background-color: #f8f8f8; padding: 20px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">© ${new Date().getFullYear()} Petopia. All rights reserved.</p>
+                <p style="margin: 0; font-size: 14px; color: #666;">
+                  <a href="https://petopia.com/privacy" style="color: #7b4397; text-decoration: underline;">Privacy Policy</a> | 
+                  <a href="https://petopia.com/terms" style="color: #7b4397; text-decoration: underline;">Terms of Service</a>
+                </p>
+                <p style="margin: 15px 0 0; font-size: 13px; color: #999; font-style: italic;">This email was sent regarding an order from Petopia. Please do not reply to this email.</p>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Cancellation email sent to ${user.email} for Order #${order._id}`);
+    console.log(`Cancellation email sent to ${user.email} for Order #${displayOrderId}`);
     return true;
   } catch (error) {
     console.error('Error sending cancellation email:', error);
     return false;
   }
 };
+// Reference: https://github.com/nodemailer/nodemailer/tree/12b792fb91045660ad1a4308e4dbcf4ec7d3c66c
+//            https://nodemailer.com/usage/using-gmail/
 
 // Placing an order
 export const placeOrder = async (req, res) => {
@@ -89,10 +179,10 @@ export const placeOrder = async (req, res) => {
     for (let item of cart.items) {
       const product = item.product;
       if (!product) {
-        return res.status(404).json({ success: false, message: `Product not found` });
+        return res.status(404).json({ success: false, message: "Product not found" });
       }
       if (product.quantity < item.quantity) {
-        return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });
+        return res.status(400).json({ success: false, message: "Insufficient stock for ${product.name}" });
       }
       totalAmount += parseFloat((item.quantity * product.price).toFixed(2));
       product.quantity -= item.quantity; // Deduct quantity
@@ -163,7 +253,6 @@ export const getEnhancedOrderDetails = async (req, res) => {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
     
-    // Create a new object 
     const enhancedOrder = order.toObject();
     
     // Get all product IDs from the order
@@ -204,13 +293,26 @@ export const getEnhancedOrderDetails = async (req, res) => {
 export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const order = await Order.findById(orderId).populate("user", "name email");
+    const order = await Order.findById(orderId)
+      .populate("user", "name email")
+      .populate("products.product");
+      
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
-
+    
     if (order.status !== "Pending") {
       return res.status(400).json({ success: false, message: "Order cannot be canceled at this stage" });
     }
-
+    
+    // Restock products
+    for (const item of order.products) {
+      const product = item.product;
+      if (product) {
+        product.quantity += item.quantity;
+        await product.save();
+        console.log(`Restocked ${item.quantity} units of product ${product._id}`);
+      }
+    }
+    
     // Update status
     order.status = "Cancelled";
     await order.save();
@@ -263,7 +365,6 @@ export const getAllOrders = async (req, res) => {
 
 // Update payment status
 export const updatePaymentStatus = async (req, res) => {
-  // Existing code remains unchanged
   try {
     const { orderId } = req.params;
     const { paymentStatus } = req.body;
@@ -296,12 +397,10 @@ const ORDER_STATUS_FLOW = {
 
 // Validate status transition
 const isValidStatusTransition = (currentStatus, newStatus) => {
-  // If current status doesn't exist in our flow map or is the same as new status
   if (!ORDER_STATUS_FLOW[currentStatus]) {
     return false;
   }
   
-  // New status is allowed from the current status?
   return ORDER_STATUS_FLOW[currentStatus].includes(newStatus);
 };
 
@@ -314,7 +413,7 @@ export const updateOrderStatus = async (req, res) => {
     console.log("Updating Order Status - Order ID:", orderId);
     console.log("New Status:", status);
 
-    // Validate status value
+    // Validate 
     if (!ORDER_STATUS_FLOW.hasOwnProperty(status)) {
       return res.status(400).json({ 
         error: "Invalid order status. Valid statuses are: " + 
@@ -322,12 +421,15 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    const order = await Order.findById(orderId).populate("user", "name email");
+    const order = await Order.findById(orderId)
+      .populate("user", "name email")
+      .populate("products.product");
+      
     if (!order) return res.status(404).json({ error: "Order not found" });
 
     const previousStatus = order.status;
     
-    // Check if the status transition is valid
+    // status transition valid?
     if (!isValidStatusTransition(previousStatus, status)) {
       return res.status(400).json({ 
         error: `Invalid status transition from '${previousStatus}' to '${status}'.`,
@@ -335,10 +437,23 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
+    // for cancelled orders
+    if (status === "Cancelled" && previousStatus !== "Cancelled") {
+      // Restock products
+      for (const item of order.products) {
+        const product = item.product;
+        if (product) {
+          product.quantity += item.quantity;
+          await product.save();
+          console.log(`Restocked ${item.quantity} units of product ${product._id}`);
+        }
+      }
+    }
+
     order.status = status;
     await order.save();
     
-    // Handle cancellation email 
+    // cancellation email 
     if (status === "Cancelled" && previousStatus !== "Cancelled") {
       if (order.user && order.user.email) {
         await sendOrderCancellationEmail(order, order.user);
@@ -353,7 +468,6 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-// Update Order
 export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -367,7 +481,10 @@ export const updateOrder = async (req, res) => {
       return res.status(400).json({ error: "Invalid order ID format" });
     }
     
-    const order = await Order.findById(id).populate("user", "name email");
+    const order = await Order.findById(id)
+      .populate("user", "name email")
+      .populate("products.product");
+      
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
@@ -376,7 +493,7 @@ export const updateOrder = async (req, res) => {
     
     // Validate status transition
     if (updateData.status) {
-      // Check if status is valid
+      // status valid?
       if (!ORDER_STATUS_FLOW.hasOwnProperty(updateData.status)) {
         return res.status(400).json({ 
           error: "Invalid order status. Valid statuses are: " + 
@@ -384,12 +501,25 @@ export const updateOrder = async (req, res) => {
         });
       }
       
-      // Check if status transition is valid
+      // status transition valid?
       if (!isValidStatusTransition(previousStatus, updateData.status)) {
         return res.status(400).json({ 
           error: `Invalid status transition from '${previousStatus}' to '${updateData.status}'.`,
           allowedTransitions: ORDER_STATUS_FLOW[previousStatus]
         });
+      }
+      
+      // for cancelled orders
+      if (updateData.status === "Cancelled" && previousStatus !== "Cancelled") {
+        // Restock products
+        for (const item of order.products) {
+          const product = item.product;
+          if (product) {
+            product.quantity += item.quantity;
+            await product.save();
+            console.log(`Restocked ${item.quantity} units of product ${product._id}`);
+          }
+        }
       }
       
       order.status = updateData.status;
@@ -427,7 +557,8 @@ export const updateOrder = async (req, res) => {
   }
 };
 
-// Download invoice as PDF
+// Download invoice 
+// Reference: PDFKit documentation - https://pdfkit.org/
 export async function downloadInvoice(req, res) {
   try {
     const { orderId } = req.params;
@@ -456,9 +587,7 @@ export async function downloadInvoice(req, res) {
     };
     
     // Header
-    doc
-      .rect(0, 0, doc.page.width, 170)
-      .fill(colors.primary);
+    doc.rect(0, 0, doc.page.width, 170).fill(colors.primary);
     
     // Logo placement
     const logoPath = path.join(__dirname, '../assets/logo1.png');
@@ -467,40 +596,25 @@ export async function downloadInvoice(req, res) {
     }
     
     // Invoice title
-    doc
-      .fillColor(colors.text)
-      .font('Courier-Bold')
-      .fontSize(28)
-      .text('INVOICE', 350, 85);
+    doc.fillColor(colors.text).font('Courier-Bold').fontSize(28).text('INVOICE', 350, 85);
     
     // Order and Customer Information
     const infoY = 200;
     
     // Invoice number and date
-    doc
-      .font('Courier')
-      .fontSize(12)
-      .fillColor(colors.text)
-      .text(`Invoice #: ${orderId}`, 50, infoY);
+    doc.font('Courier').fontSize(12).fillColor(colors.text).text(`Invoice #: ${orderId}`, 50, infoY);
     
-    doc
-      .fontSize(12)
-      .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 420, infoY);
+    doc.fontSize(12).text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 420, infoY);
     
     // Bill to section
-    doc
-      .font('Courier-Bold')
-      .text('Bill To:', 50, infoY + 30)
-      .font('Courier')
+    doc.font('Courier-Bold').text('Bill To:', 50, infoY + 30).font('Courier')
       .text(order.user?.name || 'N/A', 50, infoY + 50)
       .text(order.user?.email || 'N/A', 50, infoY + 70);
     
     // table header
     const tableTop = infoY + 110;
     const cols = { item: 50, qty: 300, unit: 370, line: 460 };
-    doc
-      .font('Courier-Bold')
-      .fontSize(12)
+    doc.font('Courier-Bold').fontSize(12)
       .text('Item', cols.item, tableTop)
       .text('Qty', cols.qty, tableTop)
       .text('Unit Price', cols.unit, tableTop)
@@ -516,39 +630,26 @@ export async function downloadInvoice(req, res) {
       const lineTotal = (product?.price * quantity).toFixed(2);
 
       doc
-        .text(name,          cols.item, y)
-        .text(quantity,      cols.qty,  y)
+        .text(name, cols.item, y)
+        .text(quantity, cols.qty,  y)
         .text(`LKR ${unitPrice}`, cols.unit, y)
         .text(`LKR ${lineTotal}`, cols.line, y);
 
       y += 20;
-      // light separator
-      doc
-        .strokeColor(colors.border)
-        .lineWidth(0.3)
-        .moveTo(cols.item, y - 5)
-        .lineTo(cols.line + 60, y - 5)
-        .stroke();
+     
+      doc.strokeColor(colors.border).lineWidth(0.3).moveTo(cols.item, y - 5).lineTo(cols.line + 60, y - 5).stroke();
     });
     
     // total box
     y += 20;
     
-    doc
-      .font('Courier-Bold')
-      .fontSize(12)
-      .text('Grand', 370, y)
-      .text(`Total: LKR`, 370, y + 20)
-      .fontSize(14)
+    doc.font('Courier-Bold').fontSize(12).text('Grand', 370, y).text(`Total: LKR`, 370, y + 20).fontSize(14)
       .text(`${order.totalAmount.toFixed(2)}`, 400, y + 20, {
         align: 'right'
       });
     
     // Thank you msg
-    doc
-      .font('Courier-Oblique')
-      .fontSize(14)
-      .fillColor(colors.accent)
+    doc.font('Courier-Oblique').fontSize(14).fillColor(colors.accent)
       .text('Thank you for shopping with Petopia Pet Store!', 20, y + 80, { align: 'right' })
     
     doc.end();
@@ -558,14 +659,15 @@ export async function downloadInvoice(req, res) {
   }
 }
 
-// is mongoose connected ?
+// is mongoose connected ? for debugging
+// Reference: https://mongoosejs.com/docs/connections.html#connection-states
 const checkMongooseConnection = () => {
   if (mongoose.connection.readyState !== 1) {
     console.warn('Warning: Mongoose connection is not ready. Current state:', mongoose.connection.readyState);
   }
 };
 
-// Direct buy functionality
+// Direct buy 
 export const directBuy = async (req, res) => {
   try {
     checkMongooseConnection();
@@ -591,7 +693,7 @@ export const directBuy = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
     
-    // Check if there's enough stock
+    // stock enough?
     if (product.quantity < quantity) {
       return res.status(400).json({ 
         success: false, 
@@ -599,10 +701,10 @@ export const directBuy = async (req, res) => {
       });
     }
 
-    // Calculate total amount
+    // total amount
     const totalAmount = parseFloat((quantity * product.price).toFixed(2));
     
-    // Create temporary cart data for checkout page
+    // Create temp cart data
     const directBuyData = {
       items: [{
         product: {
@@ -616,16 +718,15 @@ export const directBuy = async (req, res) => {
       totalAmount: totalAmount
     };
 
-    // Make sure session is initialized properly
+    // session?
     if (!req.session) {
       console.error("Session object is undefined");
       return res.status(500).json({ success: false, message: "Session not initialized" });
     }
     
-    // Store in session for use in checkout page
+    // Store in session
     req.session.directBuyData = directBuyData;
     
-    // To ensure data is saved in session before redirecting
     req.session.save((err) => {
       if (err) {
         console.error("Error saving session:", err);
@@ -708,7 +809,7 @@ export const processDirectBuyOrder = async (req, res) => {
       });
     }
     
-    // Set paymentStatus based on payment method
+    // Set paymentStatus
     const paymentMethod = req.body.paymentMethod;
     const paymentStatus = paymentMethod === 'Card' ? 'Pending' : 'Pending';
 
@@ -733,14 +834,14 @@ export const processDirectBuyOrder = async (req, res) => {
     await product.save();
     
     // Only clear direct buy data if not using card payment
-    // For card payment, we'll keep it until payment is confirmed
+    // For card payment, keep it until payment is confirmed
     if (paymentMethod !== 'Card') {
       delete req.session.directBuyData;
       
       // Save session changes
       req.session.save((err) => {
         if (err) {
-          console.error("Error saving session after clearing directBuyData:", err);
+          console.error("Error saving session after clearing directBuyData:", err); //debug
         }
       });
     }

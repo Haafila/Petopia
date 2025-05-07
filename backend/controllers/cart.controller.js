@@ -37,7 +37,7 @@ export const getCart = async (req, res) => {
     // Find the user's cart
     let cart = await Cart.findOne({ user: req.session.user._id }).populate(
       "items.product",
-      "name price images"
+      "name price imageUrl"
     );
     
     if (!cart) {
@@ -72,15 +72,14 @@ export const addToCart = async (req, res) => {
       }
   
       // Product exists in database ?
-      console.log("Searching for product in database..."); // for debugging
       const product = await Product.findById(productId);
       console.log("Product found:", product); // for debugging
   
       if (!product) {
         return res.status(404).json({ success: false, message: "Product not found" });
       }
-  
-      // Find user's cart or create a new one for user
+      
+      // find user cart
       let cart = await Cart.findOne({ user: req.session.user._id });
   
       if (!cart) {
@@ -91,16 +90,16 @@ export const addToCart = async (req, res) => {
         });
       }
   
-      // product already in cart? yes: update quantity (+1), no: add new item
+      // product already in cart? 
       const itemIndex = cart.items.findIndex(
         (item) => item.product.toString() === productId
       );
   
       if (itemIndex > -1) {
-        cart.items[itemIndex].quantity += quantity;
+        cart.items[itemIndex].quantity += quantity; // update quantity(+1)
         console.log("Updated product quantity in cart:", productId); // for debugging
       } else {
-        cart.items.push({ product: productId, quantity });
+        cart.items.push({ product: productId, quantity }); // add new product to cart
         console.log("Added new product to cart:", productId); // for debugging
       }
   
@@ -131,7 +130,7 @@ export const removeFromCart = async (req, res) => {
 
     await cart.save();
 
-    // Fetch updated cart with populated product details
+    // Fetch updated cart 
     const updatedCart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
 
     res.status(200).json({ success: true, data: updatedCart });
@@ -166,7 +165,7 @@ export const updateCartItem = async (req, res) => {
       item.quantity = quantity;
       await cart.save();
 
-      // Re-fetch the cart
+      // fetch updated cart
       const updatedCart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
       res.status(200).json({ success: true, data: updatedCart });
   } catch (err) {

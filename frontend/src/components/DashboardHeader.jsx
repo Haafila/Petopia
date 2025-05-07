@@ -21,7 +21,7 @@ export default function DashboardHeader() {
   }, []);
 
   return (
-    <div className='h-20 px-4 flex justify-between items-center border-b border-gray-200' style={{ backgroundColor: 'var(--background-light)' }}>
+    <div className='h-20 px-4 flex justify-between items-center border-b border-pink-300' style={{ backgroundColor: 'var(--background-light)' }}>
       <div className='flex items-center gap-4'>
         <div>
           <img src="/assets/logo-no-title.png" alt="" width="30%" />
@@ -32,15 +32,6 @@ export default function DashboardHeader() {
       </div>
 
       <div className='flex items-center gap-4'>
-        {/* Search Bar */}
-        <div className='relative'>
-          <HiOutlineSearch fontSize={20} className='text-gray-400 absolute top-1/2 -translate-y-1/2 left-3' />
-          <input
-            type='text'
-            placeholder='Search'
-            className='text-sm focus:outline-none h-10 w-[24rem] border border-gray-300 rounded-sm pl-11 pr-4'
-          />
-        </div>
         <div className='relative cursor-pointer margin-right-8'>
           <a href="/">
             <img

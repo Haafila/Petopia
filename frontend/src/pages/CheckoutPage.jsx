@@ -61,7 +61,7 @@ const CheckoutPage = () => {
         const response = await axios.get(`/api/users/${session._id}`);
         const userData = response.data;
   
-        // Populate form with user's saved delivery details or profile data
+        // auto-fill form with user data if available
         if (userData.deliveryDetails && Object.keys(userData.deliveryDetails).length > 0) {
           setFormData({
             name: userData.deliveryDetails.name || userData.name || '',
@@ -70,7 +70,6 @@ const CheckoutPage = () => {
             postalCode: userData.deliveryDetails.postalCode || '',
             phone: userData.deliveryDetails.phone || userData.phone || '',
           });
-          toast.info('Your saved delivery details have been loaded', { autoClose: 2000 });
         } else {
           setFormData({
             name: userData.name || '',
@@ -188,7 +187,7 @@ const CheckoutPage = () => {
     }
   };
 
-  // Save delivery details to user profile
+  // Save delivery details 
   const saveDeliveryDetails = async () => {
     if (!session?._id) {
       toast.error('You must be logged in to save delivery details');
