@@ -16,10 +16,10 @@ function Training() {
 
   // Service pricing configuration
   const servicePrices = {
-    "Obedience": 50,
-    "Agility": 60,
-    "Behavior Correction": 75,
-    "Puppy Training": 45
+    "Obedience": 5000,
+    "Agility": 6000,
+    "Behavior Correction": 7500,
+    "Puppy Training": 4500
   };
 
   const timeSlots = [
@@ -92,12 +92,12 @@ function Training() {
           details, 
           date, 
           time,
-          amount // Include amount in the appointment
+          amount 
         };
 
         axios.post("http://localhost:5000/appointments/add", newAppointment)
           .then(() => {
-            alert(`Training Appointment Booked Successfully! Total: $${amount.toFixed(2)}`);
+            alert(`Training Appointment Booked Successfully! Total: LKR${amount.toFixed(2)}`);
             setPetId("");
             setTrainingType("");
             setDate("");
@@ -171,7 +171,7 @@ function Training() {
               <option value="">--Select Training Service--</option>
               {Object.entries(servicePrices).map(([service, price]) => (
                 <option key={service} value={service}>
-                  {service} (${price.toFixed(2)})
+                  {service} (LKR{price.toFixed(2)})
                 </option>
               ))}
             </select>
@@ -183,7 +183,7 @@ function Training() {
               Selected Service: <span className="font-bold">{trainingType || "None selected"}</span>
             </p>
             <p className="text-[var(--dark-brown)] font-medium">
-              Total Amount: <span className="font-bold">${amount.toFixed(2)}</span>
+              Total Amount: <span className="font-bold">LKR{amount.toFixed(2)}</span>
             </p>
           </div>
 
@@ -233,7 +233,7 @@ function Training() {
                 ? "bg-gray-400 cursor-not-allowed" 
                 : "bg-[var(--main-color)] hover:bg-[var(--puppy-brown)] text-white"}`}
           >
-            {amount > 0 ? `Book Appointment ($${amount.toFixed(2)})` : "Book Appointment"}
+            {amount > 0 ? `Book Appointment (LKR${amount.toFixed(2)})` : "Book Appointment"}
           </button>
         </form>
       </div>
