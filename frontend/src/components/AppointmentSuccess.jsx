@@ -116,13 +116,13 @@ function AppointmentSuccess() {
         </>
       )}
 
-      <SummaryRow label="Amount:" value={`$${amount?.toFixed(2)}`} />
+      <SummaryRow label="Amount:" value={`LKR${amount?.toFixed(2)}`} />
 
       <button
         className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-medium mt-4"
         onClick={() => navigate(`/customer/payment?amount=${amount}`)}
       >
-        Pay Now (${amount?.toFixed(2)})
+        Pay Now (LKR{amount?.toFixed(2)})
       </button>
     </div>
   );
