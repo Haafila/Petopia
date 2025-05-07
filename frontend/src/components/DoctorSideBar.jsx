@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaClipboardList, FaBars, FaPaw, FaCalendarAlt, FaTachometerAlt, FaQuestionCircle, FaUser, FaShoppingCart, FaHeart, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaClipboardList, FaBars, FaCalendarAlt, FaTachometerAlt, FaQuestionCircle, FaUser, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { IoPawSharp } from "react-icons/io5";
 import LogoutButton from "./LogoutButton";
 
@@ -11,7 +11,6 @@ const DocterSideBar = () => {
   const toggleNavbar = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  
 
   return (
     <div className="flex h-screen">
@@ -43,11 +42,6 @@ const DocterSideBar = () => {
           <li>
             <Link to="/doctor/profile" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
               {isOpen ? <FaUser className="mr-3" /> : <FaUser />} {isOpen && "My Account"}
-            </Link>
-          </li>
-          <li>
-            <Link to="/doctor/pets" className="flex items-center text-white hover:bg-rose-400 p-2 rounded block">
-              {isOpen ? <FaPaw className="mr-3" /> : <FaPaw />} {isOpen && "Pets"}
             </Link>
           </li>
           <li>

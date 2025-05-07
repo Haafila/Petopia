@@ -74,13 +74,16 @@ const CustomerDashboard = () => {
 
     return (
       <div className="bg-rose-200 rounded-xl p-6">
-        <h3 className="text-xl font-bold mb-4 text-[#3d1e24]">Active Orders</h3>
-        <div className="space-y-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold text-[#3d1e24]">Active Orders</h3>
+          <Link to="/customer/orders" className="bg-rose-500 text-white px-4 py-2 rounded-md hover:bg-rose-600">
+            See All
+          </Link>
+        </div>
+        {/* Fixed-size scrolling div */}
+        <div className="h-64 overflow-y-auto space-y-4 space-x-4">
           {orders.map((order) => (
-            <div 
-              key={order._id} 
-              className="border-b border-rose-200 pb-3 last:border-b-0"
-            >
+            <div key={order._id} className="border-b border-rose-200 pb-3 last:border-b-0">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-medium text-rose-700">
@@ -99,6 +102,8 @@ const CustomerDashboard = () => {
                   {new Date(order.createdAt).toLocaleDateString()}
                 </span>
               </div>
+              <br />
+              <hr />
             </div>
           ))}
         </div>
