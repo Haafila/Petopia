@@ -14,7 +14,7 @@ function Boarding() {
   const [duration, setDuration] = useState(0);
 
   // Pricing configuration
-  const dailyRate = 50; // $50 per day
+  const dailyRate = 5000; // $50 per day
   const weeklyDiscount = 0.9; // 10% discount for stays of 7+ days
 
   useEffect(() => {
@@ -97,7 +97,7 @@ function Boarding() {
 
     axios.post("http://localhost:5000/appointments/add", newAppointment)
       .then(() => {
-        alert(`Boarding Booked Successfully! Total: $${amount.toFixed(2)}`);
+        alert(`Boarding Booked Successfully! Total: LKR${amount.toFixed(2)}`);
         setPetId("");
         setStartDate("");
         setEndDate("");
@@ -190,7 +190,7 @@ function Boarding() {
               </div>
               <div>
                 <p className="font-medium">Daily Rate:</p>
-                <p>${dailyRate.toFixed(2)}</p>
+                <p>LKR{dailyRate.toFixed(2)}</p>
               </div>
             </div>
             {duration >= 7 && (
@@ -201,7 +201,7 @@ function Boarding() {
             )}
             <div className="mt-2 pt-2 border-t border-[var(--grey)]">
               <p className="font-bold">Total Amount:</p>
-              <p className="text-lg">${amount.toFixed(2)}</p>
+              <p className="text-lg">LKR{amount.toFixed(2)}</p>
             </div>
           </div>
 
@@ -213,7 +213,7 @@ function Boarding() {
                 ? "bg-gray-400 cursor-not-allowed" 
                 : "bg-[var(--main-color)] hover:bg-[var(--puppy-brown)] text-white"}`}
           >
-            {amount > 0 ? `Book Boarding ($${amount.toFixed(2)})` : "Book Boarding"}
+            {amount > 0 ? `Book Boarding (LKR${amount.toFixed(2)})` : "Book Boarding"}
           </button>
         </form>
       </div>
