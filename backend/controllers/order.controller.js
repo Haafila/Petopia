@@ -1,6 +1,7 @@
 import PDFDocument from 'pdfkit';
 import Order from "../models/order.model.js";
 import Cart from "../models/cart.model.js";
+import Product from "../models/product.model.js";
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -147,6 +148,54 @@ export const getOrderDetails = async (req, res) => {
     res.json(order);
   } catch (error) {
     console.error("Error fetching order details:", error.message);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getEnhancedOrderDetails = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    
+    // Find the basic order
+    const order = await Order.findById(orderId).populate("user", "name email");
+    
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+    
+    // Create a new object 
+    const enhancedOrder = order.toObject();
+    
+    // Get all product IDs from the order
+    const productIds = order.products.map(item => item.product);
+    
+    // Fetch all the products
+    const products = await Product.find({ _id: { $in: productIds } });
+    
+    // Create a map for quick lookup
+    const productMap = {};
+    products.forEach(product => {
+      productMap[product._id.toString()] = product;
+    });
+  
+    enhancedOrder.products = order.products.map(item => {
+      const productId = item.product.toString();
+      const product = productMap[productId] || null;
+      
+      return {
+        product: product ? {
+          _id: productId,
+          name: product.name,
+          price: product.price,
+        } : productId,
+        quantity: item.quantity,
+        _id: item._id
+      };
+    });
+    
+    res.json(enhancedOrder);
+  } catch (error) {
+    console.error("Error fetching enhanced order details:", error.message);
     res.status(500).json({ error: "Server error" });
   }
 };

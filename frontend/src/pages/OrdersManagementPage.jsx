@@ -120,8 +120,17 @@ const OrderManagementPage = () => {
         }
     };
 
-    const handleViewDetails = (order) => {
-        setViewDetails(order);
+    const handleViewDetails = async (order) => {
+        try {
+          // Use the enhanced API endpoint
+          const response = await axios.get(`/api/orders/${order._id}/enhanced`);
+          setViewDetails(response.data);
+        } catch (error) {
+          console.error("Error fetching order details:", error);
+          toast.error("Failed to load order details");
+          // Basic order data
+          setViewDetails(order);
+        }
     };
 
     const closeDetails = () => {
@@ -301,25 +310,6 @@ const OrderManagementPage = () => {
     return (
         <div className="container mx-auto px-6 py-8">
             <h1 className="text-3xl font-extrabold mb-4">Order Management</h1>
-            
-            {/* Status Flow Information Panel */}
-            <div className="bg-pink-50 p-4 mb-6 rounded-lg border border-pink-200">
-                <h3 className="font-semibold text-pink-800 mb-2">Order Status Flow</h3>
-                <div className="flex flex-wrap gap-2 text-sm">
-                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
-                        Pending → Processing or Cancelled
-                    </div>
-                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
-                        Processing → Shipped or Cancelled
-                    </div>
-                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
-                        Shipped → Delivered or Cancelled
-                    </div>
-                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
-                        Delivered/Cancelled → (No further changes)
-                    </div>
-                </div>
-            </div>
             
             {/* OrderFilter Component */}
             <OrderFilter onFilterApply={handleFilterApply} />

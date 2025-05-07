@@ -1,5 +1,5 @@
 import express from "express";
-import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder, downloadInvoice, directBuy, getDirectBuyData, processDirectBuyOrder } from "../controllers/order.controller.js";
+import { placeOrder, getUserOrders, getAllOrders, updateOrderStatus, updatePaymentStatus, deleteOrder, getOrderDetails, cancelOrder, updateOrder, downloadInvoice, directBuy, getDirectBuyData, processDirectBuyOrder, getEnhancedOrderDetails } from "../controllers/order.controller.js";
 import sessionAuth from "../middleware/auth.session.js";
 
 const router = express.Router();
@@ -22,5 +22,6 @@ router.put("/:id", updateOrder);
 router.delete("/:id", deleteOrder);
 router.patch("/:orderId/status", updateOrderStatus);
 router.patch("/:orderId/payment-status", updatePaymentStatus);
+router.get('/:orderId/enhanced', getEnhancedOrderDetails);
 
 export default router;
