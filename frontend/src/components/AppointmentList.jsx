@@ -104,7 +104,7 @@ function AppointmentList() {
                 </div>
 
                 <div className="p-3 md:p-4">
-                    {/* Search Input (Pet name and Owner name only) */}
+                    {/* Search Input (Pet name and Owner name) */}
                     <div className="mb-4">
                         <input
                             type="text"
@@ -117,7 +117,7 @@ function AppointmentList() {
 
                     <AppointmentFilter filter={filter} onFilterChange={handleFilterChange} />
 
-                    {/* Rest of the table and components remain the same */}
+                    {/* Table */}
                     <div className="mt-4 border border-[#ccc4ba] rounded-md shadow-sm">
                         <div className="overflow-x-auto">
                             <div className="overflow-y-auto max-h-110 scrollbar-thin scrollbar-thumb-[#ccc4ba] scrollbar-track-transparent">
