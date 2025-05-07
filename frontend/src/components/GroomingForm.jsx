@@ -15,10 +15,10 @@ function Grooming() {
   const [amount, setAmount] = useState(0); 
   // Service pricing configuration
   const servicePrices = {
-    "Bathing": 30,
-    "Haircut": 45,
-    "Nail Trimming": 20,
-    "Full Grooming Package": 75 
+    "Bathing": 3000,
+    "Haircut": 4500,
+    "Nail Trimming": 2000,
+    "Full Grooming Package": 7500 
   };
 
   const timeSlots = [
@@ -96,7 +96,7 @@ function Grooming() {
 
         axios.post("http://localhost:5000/appointments/add", newAppointment)
           .then(() => {
-            alert(`Appointment Booked Successfully! Total: $${amount.toFixed(2)}`);
+            alert(`Appointment Booked Successfully! Total: LKR${amount.toFixed(2)}`);
             setPetId("");
             setGroomingType("");
             setDate("");
@@ -170,7 +170,7 @@ function Grooming() {
               <option value="">--Select Grooming Service--</option>
               {Object.entries(servicePrices).map(([service, price]) => (
                 <option key={service} value={service}>
-                  {service} (${price.toFixed(2)})
+                  {service} (LKR{price.toFixed(2)})
                 </option>
               ))}
             </select>
@@ -182,7 +182,7 @@ function Grooming() {
               Selected Service: <span className="font-bold">{groomingType || "None selected"}</span>
             </p>
             <p className="text-[var(--dark-brown)] font-medium">
-              Total Amount: <span className="font-bold">${amount.toFixed(2)}</span>
+              Total Amount: <span className="font-bold">LKR{amount.toFixed(2)}</span>
             </p>
           </div>
 
@@ -232,7 +232,7 @@ function Grooming() {
                 ? "bg-gray-400 cursor-not-allowed" 
                 : "bg-[var(--main-color)] hover:bg-[var(--puppy-brown)] text-white"}`}
           >
-            {amount > 0 ? `Book Appointment ($${amount.toFixed(2)})` : "Book Appointment"}
+            {amount > 0 ? `Book Appointment (LKR${amount.toFixed(2)})` : "Book Appointment"}
           </button>
         </form>
       </div>
