@@ -153,17 +153,6 @@ const CustomerDashboard = () => {
             <OrderCard />
           </div>
 
-          {/* Upcoming Appointments Card */}
-          <div className="bg-gray-200 rounded-xl p-6">
-            <h3 className="text-xl font-bold mb-4 text-[#3d1e24] flex items-center">
-              <Clock className="mr-2 text-amber-600" />
-              Upcoming Appointments
-            </h3>
-            <div className="text-center text-rose-600">
-              No upcoming appointments
-            </div>
-          </div>
-
           {/* Reminders Card */}
           <div className="bg-gray-200 rounded-xl p-6 mb-10">
             <h3 className="text-xl font-bold mb-4 text-[#3d1e24] flex items-center">

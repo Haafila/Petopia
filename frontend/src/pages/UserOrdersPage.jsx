@@ -120,7 +120,7 @@ const UserOrdersPage = () => {
   );
 
   if (error) return (
-    <div className="min-h-screen bg-[var(--background-light)] py-16">
+    <div className="min-h-screen bg-[var(--light-pink)] py-16">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center p-8 bg-red-50 rounded-lg shadow-sm border border-red-200">
           <div className="text-red-600 mb-2"><X size={32} className="mx-auto" /></div>
@@ -190,7 +190,7 @@ const UserOrdersPage = () => {
 
                 {expandedOrder === order._id && (
                   <div className="border-t border-[var(--light-grey)]">
-                    <div className="p-5 bg-[var(--background-light)] bg-opacity-50">
+                    <div className="p-5 bg-[var(--light-pink)] bg-opacity-50">
                       <h3 className="font-medium text-[var(--dark-brown)] mb-3">Order Items</h3>
                       <ul className="divide-y divide-[var(--light-grey)]">
                         {order.products?.map((item, index) => (

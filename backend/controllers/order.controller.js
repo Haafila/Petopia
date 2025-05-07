@@ -212,37 +212,6 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// Update order status
-export const updateOrderStatus = async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { status } = req.body;
-
-    console.log("Updating Order Status - Order ID:", orderId); // Debug
-    console.log("New Status:", status); // Debug
-
-    const order = await Order.findById(orderId).populate("user", "name email");
-    if (!order) return res.status(404).json({ error: "Order not found" });
-
-    const previousStatus = order.status; // Store previous status
-    order.status = status;
-    await order.save();
-    
-    // status change to Cancelled
-    if (status === "Cancelled" && previousStatus !== "Cancelled") {
-      if (order.user && order.user.email) {
-        await sendOrderCancellationEmail(order, order.user);
-      }
-    }
-
-    console.log("Updated Order:", order); // Debug
-    res.json({ message: "Order status updated", order });
-  } catch (error) {
-    console.error("Error updating order status:", error.message); // Debug
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
 // Update payment status
 export const updatePaymentStatus = async (req, res) => {
   // Existing code remains unchanged
@@ -267,7 +236,75 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
-// Update order status & payment status
+// Order status progression
+const ORDER_STATUS_FLOW = {
+  "Pending": ["Processing", "Cancelled"],
+  "Processing": ["Shipped", "Cancelled"],
+  "Shipped": ["Delivered", "Cancelled"],
+  "Delivered": [],
+  "Cancelled": []
+};
+
+// Validate status transition
+const isValidStatusTransition = (currentStatus, newStatus) => {
+  // If current status doesn't exist in our flow map or is the same as new status
+  if (!ORDER_STATUS_FLOW[currentStatus]) {
+    return false;
+  }
+  
+  // New status is allowed from the current status?
+  return ORDER_STATUS_FLOW[currentStatus].includes(newStatus);
+};
+
+// Update order status
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    console.log("Updating Order Status - Order ID:", orderId);
+    console.log("New Status:", status);
+
+    // Validate status value
+    if (!ORDER_STATUS_FLOW.hasOwnProperty(status)) {
+      return res.status(400).json({ 
+        error: "Invalid order status. Valid statuses are: " + 
+          Object.keys(ORDER_STATUS_FLOW).join(", ") 
+      });
+    }
+
+    const order = await Order.findById(orderId).populate("user", "name email");
+    if (!order) return res.status(404).json({ error: "Order not found" });
+
+    const previousStatus = order.status;
+    
+    // Check if the status transition is valid
+    if (!isValidStatusTransition(previousStatus, status)) {
+      return res.status(400).json({ 
+        error: `Invalid status transition from '${previousStatus}' to '${status}'.`,
+        allowedTransitions: ORDER_STATUS_FLOW[previousStatus]
+      });
+    }
+
+    order.status = status;
+    await order.save();
+    
+    // Handle cancellation email 
+    if (status === "Cancelled" && previousStatus !== "Cancelled") {
+      if (order.user && order.user.email) {
+        await sendOrderCancellationEmail(order, order.user);
+      }
+    }
+
+    console.log("Updated Order:", order);
+    res.json({ message: "Order status updated", order });
+  } catch (error) {
+    console.error("Error updating order status:", error.message);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// Update Order
 export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -286,9 +323,26 @@ export const updateOrder = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
     
-    const previousStatus = order.status; // Store previous status
+    const previousStatus = order.status;
     
+    // Validate status transition
     if (updateData.status) {
+      // Check if status is valid
+      if (!ORDER_STATUS_FLOW.hasOwnProperty(updateData.status)) {
+        return res.status(400).json({ 
+          error: "Invalid order status. Valid statuses are: " + 
+            Object.keys(ORDER_STATUS_FLOW).join(", ") 
+        });
+      }
+      
+      // Check if status transition is valid
+      if (!isValidStatusTransition(previousStatus, updateData.status)) {
+        return res.status(400).json({ 
+          error: `Invalid status transition from '${previousStatus}' to '${updateData.status}'.`,
+          allowedTransitions: ORDER_STATUS_FLOW[previousStatus]
+        });
+      }
+      
       order.status = updateData.status;
       console.log("Updated order status to:", updateData.status);
     }
@@ -300,7 +354,7 @@ export const updateOrder = async (req, res) => {
     
     await order.save();
     
-    // order status change to Cancelled
+    // Handle cancellation email
     if (updateData.status === "Cancelled" && previousStatus !== "Cancelled") {
       if (order.user && order.user.email) {
         const emailSent = await sendOrderCancellationEmail(order, order.user);

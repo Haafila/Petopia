@@ -1,4 +1,6 @@
 import Payment from "../models/Payment.js";
+import { customAlphabet } from 'nanoid';
+const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
 
 const createPayment = async (paymentData) => {
   try {
@@ -15,8 +17,8 @@ const createPayment = async (paymentData) => {
     // Create payment record with Completed status
     const payment = new Payment({
       ...paymentData,
-      status: "Completed", // Always set status as Completed
-      paymentId: `p${Math.floor(100 + Math.random() * 900)}`,
+      status: "Completed",
+      paymentId: `p${nanoid()}`,  // e.g. "p4F7A1ZQ8"
       createdAt: new Date()
     });
 

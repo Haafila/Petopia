@@ -2,10 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate';
+import { AlertCircle, CheckCircle, XCircle, TruckIcon, PackageIcon, Clock } from 'lucide-react';
 import OrderStatusForm from '../components/OrderStatusForm';
 import OrderDetailsView from '../components/OrderDetailsView';
 import { useConfirmDialog } from '../components/ConfirmDialog';
 import OrderFilter from '../components/OrderFilter';
+
+// Order status flow 
+const ORDER_STATUS_FLOW = {
+  "Pending": ["Processing", "Cancelled"],
+  "Processing": ["Shipped", "Cancelled"],
+  "Shipped": ["Delivered", "Cancelled"],
+  "Delivered": [],
+  "Cancelled": []
+};
 
 const OrderManagementPage = () => {
     const [orders, setOrders] = useState([]);
@@ -72,6 +82,12 @@ const OrderManagementPage = () => {
             console.log("Updating:", updateType, "for order:", editingOrder._id, "to status:", updatedStatus);
             
             if (updateType === 'order') {
+                // Validate status transition
+                if (!ORDER_STATUS_FLOW[editingOrder.status]?.includes(updatedStatus)) {
+                    toast.error(`Cannot update status from ${editingOrder.status} to ${updatedStatus}`);
+                    return;
+                }
+                
                 // Special handling for cancellation
                 const isBeingCancelled = updatedStatus === "Cancelled";
                 
@@ -96,7 +112,11 @@ const OrderManagementPage = () => {
             fetchOrders();
         } catch (error) {
             console.error("Update error:", error);
-            toast.error(`Failed to update ${updateType} status: ${error.message}`);
+            if (error.response?.data?.error) {
+                toast.error(`Failed to update: ${error.response.data.error}`);
+            } else {
+                toast.error(`Failed to update ${updateType} status: ${error.message}`);
+            }
         }
     };
 
@@ -162,8 +182,43 @@ const OrderManagementPage = () => {
     // Render status badge
     const renderStatusBadge = (status, type = 'order') => {
         const colorClasses = getStatusColor(status, type);
+        let icon = null;
+        
+        if (type === 'order') {
+            switch (status?.toLowerCase()) {
+                case 'pending':
+                    icon = <Clock size={14} className="mr-1" />;
+                    break;
+                case 'processing':
+                    icon = <PackageIcon size={14} className="mr-1" />;
+                    break;
+                case 'shipped':
+                    icon = <TruckIcon size={14} className="mr-1" />;
+                    break;
+                case 'delivered':
+                    icon = <CheckCircle size={14} className="mr-1" />;
+                    break;
+                case 'cancelled':
+                    icon = <XCircle size={14} className="mr-1" />;
+                    break;
+            }
+        } else if (type === 'payment') {
+            switch (status?.toLowerCase()) {
+                case 'paid':
+                    icon = <CheckCircle size={14} className="mr-1" />;
+                    break;
+                case 'failed':
+                    icon = <XCircle size={14} className="mr-1" />;
+                    break;
+                case 'pending':
+                    icon = <AlertCircle size={14} className="mr-1" />;
+                    break;
+            }
+        }
+        
         return (
-            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClasses}`}>
+            <span className={`px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${colorClasses}`}>
+                {icon}
                 {status || 'N/A'}
             </span>
         );
@@ -212,6 +267,12 @@ const OrderManagementPage = () => {
 
     // Confirmation dialog specifically for cancellation
     const handleCancelOrder = (order) => {
+        // Check if cancellation is allowed for this order status
+        if (!ORDER_STATUS_FLOW[order.status]?.includes('Cancelled')) {
+            toast.error(`Cannot cancel order in '${order.status}' status`);
+            return;
+        }
+        
         openConfirmDialog({
             title: 'Cancel Order',
             message: 'Are you sure you want to cancel this order? An email notification will be sent to the customer.',
@@ -222,17 +283,47 @@ const OrderManagementPage = () => {
                     toast.success('Order cancelled successfully. Customer has been notified via email.');
                     fetchOrders();
                 } catch (error) {
-                    toast.error('Failed to cancel order');
+                    if (error.response?.data?.error) {
+                        toast.error(`Failed to cancel: ${error.response.data.error}`);
+                    } else {
+                        toast.error('Failed to cancel order');
+                    }
                 }
             }
         });
     };
 
+    // Get allowed status transitions for an order
+    const getAllowedStatusTransitions = (order) => {
+        return ORDER_STATUS_FLOW[order.status] || [];
+    };
+
     return (
-        <div className="container h-100 mx-auto px-6 py-8 mx-auto">
+        <div className="container mx-auto px-6 py-8">
             <h1 className="text-3xl font-extrabold mb-4">Order Management</h1>
+            
+            {/* Status Flow Information Panel */}
+            <div className="bg-pink-50 p-4 mb-6 rounded-lg border border-pink-200">
+                <h3 className="font-semibold text-pink-800 mb-2">Order Status Flow</h3>
+                <div className="flex flex-wrap gap-2 text-sm">
+                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
+                        Pending → Processing or Cancelled
+                    </div>
+                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
+                        Processing → Shipped or Cancelled
+                    </div>
+                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
+                        Shipped → Delivered or Cancelled
+                    </div>
+                    <div className="bg-white px-3 py-1 rounded border border-pink-200">
+                        Delivered/Cancelled → (No further changes)
+                    </div>
+                </div>
+            </div>
+            
             {/* OrderFilter Component */}
             <OrderFilter onFilterApply={handleFilterApply} />
+            
             {isFormOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
                     <OrderStatusForm
@@ -240,6 +331,7 @@ const OrderManagementPage = () => {
                         onSubmit={handleFormSubmit}
                         onClose={() => setIsFormOpen(false)}
                         type={updateType}
+                        allowedStatuses={updateType === 'order' ? getAllowedStatusTransitions(editingOrder) : undefined}
                     />
                 </div>
             )}
@@ -262,6 +354,7 @@ const OrderManagementPage = () => {
                     }}
                     formatPrice={formatPrice}
                     renderStatusBadge={renderStatusBadge}
+                    allowedStatusTransitions={getAllowedStatusTransitions(viewDetails)}
                 />
             )}
 
@@ -272,7 +365,7 @@ const OrderManagementPage = () => {
                         <p className="mt-2 text-gray-600">Loading Orders...</p>
                     </div>
                 ) : (
-                    <table className="min-w-full divide-y divide-pink-200 border border-pink-300 rounded-full">
+                    <table className="min-w-full divide-y divide-pink-200 border border-pink-300">
                         <thead className="bg-pink-50">
                             <tr>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
@@ -320,19 +413,24 @@ const OrderManagementPage = () => {
                                                 >
                                                     View
                                                 </button>
-                                                <button
-                                                    onClick={() => handleStatusUpdate(order, 'order')}
-                                                    className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition duration-150"
-                                                >
-                                                    Update Order
-                                                </button>
+                                                
+                                                {ORDER_STATUS_FLOW[order.status]?.length > 0 && (
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(order, 'order')}
+                                                        className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition duration-150"
+                                                    >
+                                                        Update Status
+                                                    </button>
+                                                )}
+                                                
                                                 <button
                                                     onClick={() => handleStatusUpdate(order, 'payment')}
                                                     className="bg-purple-500 text-white px-3 py-1 rounded-md hover:bg-purple-600 transition duration-150"
                                                 >
                                                     Update Payment
                                                 </button>
-                                                {order.status !== 'Cancelled' && (
+                                                
+                                                {ORDER_STATUS_FLOW[order.status]?.includes('Cancelled') && (
                                                     <button
                                                         onClick={() => handleCancelOrder(order)}
                                                         className="bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition duration-150"
@@ -340,6 +438,7 @@ const OrderManagementPage = () => {
                                                         Cancel
                                                     </button>
                                                 )}
+                                                
                                                 <button
                                                     onClick={() => handleDelete(order._id)}
                                                     className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-150"
