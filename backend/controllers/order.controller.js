@@ -182,7 +182,7 @@ export const placeOrder = async (req, res) => {
         return res.status(404).json({ success: false, message: "Product not found" });
       }
       if (product.quantity < item.quantity) {
-        return res.status(400).json({ success: false, message: "Insufficient stock for ${product.name}" });
+        return res.status(400).json({ success: false, message: `Insufficient stock for ${product.name}` });
       }
       totalAmount += parseFloat((item.quantity * product.price).toFixed(2));
       product.quantity -= item.quantity; // Deduct quantity

@@ -95,7 +95,7 @@ const CheckoutPage = () => {
     fetchUserData();
   }, [session]); 
   
-  // Secondary effect for loading details when direct buy data is loaded
+  // for Direct buy data load
   useEffect(() => {
     if (isDirectBuy && directBuyData && !userDetailsLoaded && session) {
       setUserDetailsLoaded(false); // Reset flag to trigger data fetch
@@ -344,7 +344,7 @@ const CheckoutPage = () => {
                 <button 
                   type="submit" 
                   disabled={!paymentMethod || isSubmitting} 
-                  className="w-full bg-[var(--main-color)] text-white py-3 mt-4 rounded shadow-md hover:shadow-lg transition-all hover:bg-[var(--light-purple)] disabled:bg-[var(--grey)]">
+                  className="w-full bg-[var(--main-color)] text-white py-3 mt-4 rounded shadow-md hover:shadow-lg transition-all hover:bg-rose-400 disabled:bg-[var(--grey)]">
                   {isSubmitting ? 'Placing Order...' : 'Place Order'}
                 </button>
               </form>

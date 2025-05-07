@@ -8,7 +8,7 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch latest cart data
+  // Fetch cart data
   const fetchCart = async () => {
     setLoading(true);
     try {
@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
     fetchCart(); 
   }, []);
 
-  // Add item to cart and refresh data
+  // Add item to cart 
   const addToCart = async (productId, quantity) => {
     try {
       await axios.post("/api/cart/add", { productId, quantity });
@@ -36,7 +36,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Clear cart and refresh data
+  // Clear cart 
   const clearCart = async () => {
     try {
       await axios.delete("/api/cart/clear"); 
@@ -46,7 +46,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Update quantity and refresh data
+  // Update quantity 
   const updateQuantity = async (itemId, quantity) => {
     try {
       await axios.put(`/api/cart/update/${itemId}`, { quantity });
@@ -56,7 +56,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Remove item and refresh data
+  // Remove item 
   const removeFromCart = async (itemId) => {
     try {
       await axios.delete(`/api/cart/remove/${itemId}`);

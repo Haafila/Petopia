@@ -42,6 +42,8 @@ const ProductsShopPage = () => {
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Reference: https://www.npmjs.com/package/react-paginate
+
     // Calculate pagination
     const offset = currentPage * itemsPerPage;
     const currentProducts = filteredProducts.slice(offset, offset + itemsPerPage);
