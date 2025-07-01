@@ -1,15 +1,24 @@
-# ITP_project_Y2S2_Petopia
-Petopia is an online pet care management system developed using the MERN stack (MongoDB, Express.js, React, Node.js). This project is part of the Year 2, Semester 2 (Y2S2) module for Information Technology Project (ITP).
+# 🐾 Petopia – Online Pet Care Management System
 
-## Overview
-Petopia aims to provide a comprehensive platform for pet owners and pet care providers to manage and streamline various pet care activities. The system includes features such as:
+**Petopia** is an all-in-one online pet care management system developed using the **MERN stack** (**MongoDB**, **Express.js**, **React**, **Node.js**).  
+This project was developed as part of my **Information Technology Project (ITP)** module in **Year 2, Semester 2 (Y2S2)**.
 
-- User and Pet management
-- User authentication
-- Appointment management
-- Adoption management
-- Product store and inventory management
-- Finance management
+## 📋 Overview
+
+Petopia aims to provide a comprehensive platform for **pet owners** and **pet care providers** to manage and streamline various pet care activities. 🐶🐱
+
+---
+
+## ✨ Key Features
+
+✅ **User & Pet Management** – Manage profiles and pet information  
+✅ **User Authentication** – Secure login & access control  
+✅ **Appointment Management** – Schedule, manage, and track appointments  
+✅ **Adoption Management** – Manage pet adoptions efficiently  
+✅ **Product Store & Inventory** – Manage products, sales, and stock  
+✅ **Finance Management** – Track payments and financial records
+
+---
 
 ## Technologies Used
 
@@ -18,13 +27,17 @@ Petopia aims to provide a comprehensive platform for pet owners and pet care pro
 - **React**
 - **Node.js**
 
-## Project Goals
+---
 
-* To develop a user-friendly and efficient pet care management system.
-* To enhance the skills and knowledge of the development team in using the MERN stack.
-* To provide a valuable tool for pet owners and care providers to improve the quality of pet care.
+## 🎯 Project Goals
 
-## My Contribution – Appointment Management
+- 🐾 Develop a **user-friendly** and efficient pet care management system.
+- 🧑‍💻 Enhance the development team’s skills in using the **MERN stack**.
+- 📈 Provide a valuable tool for pet owners and care providers to improve the quality of pet care.
+
+---
+
+## 🙋‍♂️ My Contribution – **Appointment Management**
 
 As part of the team, I was responsible for designing and implementing the **Appointment Management** module. My contributions include:
 
