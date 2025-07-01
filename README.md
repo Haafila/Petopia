@@ -20,7 +20,7 @@ Petopia aims to provide a comprehensive platform for **pet owners** and **pet ca
 
 ---
 
-## Technologies Used
+## ⚙️ Technologies Used
 
 - **MongoDB**
 - **Express.js**
